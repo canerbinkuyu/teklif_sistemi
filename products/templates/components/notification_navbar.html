@@ -1,0 +1,202 @@
+<!-- Bildirim Navbar - Her sayfanın üstüne eklenecek -->
+<style>
+.notification-bell {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+    font-size: 24px;
+    color: #333;
+    padding: 8px;
+}
+
+.notification-badge {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: #dc3545;
+    color: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    font-size: 11px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.notification-dropdown {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    width: 350px;
+    max-height: 400px;
+    overflow-y: auto;
+    z-index: 1000;
+    margin-top: 10px;
+}
+
+.notification-dropdown.show {
+    display: block;
+}
+
+.notification-header {
+    padding: 15px 20px;
+    border-bottom: 2px solid #f0f0f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.notification-header h4 {
+    font-size: 16px;
+    color: #333;
+}
+
+.mark-all-read {
+    color: #007bff;
+    font-size: 12px;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.mark-all-read:hover {
+    text-decoration: underline;
+}
+
+.notification-item {
+    padding: 15px 20px;
+    border-bottom: 1px solid #f0f0f0;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.notification-item:hover {
+    background: #f8f9fa;
+}
+
+.notification-item.unread {
+    background: #e3f2fd;
+}
+
+.notification-title {
+    font-weight: 600;
+    color: #333;
+    font-size: 14px;
+    margin-bottom: 5px;
+}
+
+.notification-message {
+    color: #666;
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+.notification-time {
+    color: #999;
+    font-size: 11px;
+    margin-top: 5px;
+}
+
+.notification-empty {
+    padding: 40px 20px;
+    text-align: center;
+    color: #999;
+}
+
+.notification-type-icon {
+    margin-right: 5px;
+}
+</style>
+
+<div class="notification-bell" onclick="toggleNotifications()">
+    🔔
+    {% if unread_count > 0 %}
+    <span class="notification-badge">{{ unread_count }}</span>
+    {% endif %}
+    
+    <div class="notification-dropdown" id="notificationDropdown">
+        <div class="notification-header">
+            <h4>🔔 Bildirimler</h4>
+            {% if unread_count > 0 %}
+            <a href="#" class="mark-all-read" onclick="markAllAsRead(); return false;">Tümünü okundu işaretle</a>
+            {% endif %}
+        </div>
+        
+        {% if notifications %}
+            {% for notification in notifications %}
+            <div class="notification-item {% if not notification.is_read %}unread{% endif %}" 
+                 onclick="markAsRead({{ notification.id }}, '{{ notification.link }}')">
+                <div class="notification-title">
+                    {% if notification.notification_type == 'success' %}
+                        <span class="notification-type-icon">✅</span>
+                    {% elif notification.notification_type == 'warning' %}
+                        <span class="notification-type-icon">⚠️</span>
+                    {% elif notification.notification_type == 'error' %}
+                        <span class="notification-type-icon">❌</span>
+                    {% else %}
+                        <span class="notification-type-icon">ℹ️</span>
+                    {% endif %}
+                    {{ notification.title }}
+                </div>
+                <div class="notification-message">{{ notification.message|truncatewords:15 }}</div>
+                <div class="notification-time">{{ notification.created_at|timesince }} önce</div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="notification-empty">
+                <div style="font-size: 48px; margin-bottom: 10px;">🔕</div>
+                <p>Bildiriminiz yok</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+function toggleNotifications() {
+    const dropdown = document.getElementById('notificationDropdown');
+    dropdown.classList.toggle('show');
+}
+
+function markAsRead(notificationId, link) {
+    fetch('/products/notifications/' + notificationId + '/mark-read/', {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/json',
+        },
+    }).then(() => {
+        if (link) {
+            window.location.href = link;
+        } else {
+            location.reload();
+        }
+    });
+}
+
+function markAllAsRead() {
+    fetch('/products/notifications/mark-all-read/', {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/json',
+        },
+    }).then(() => {
+        location.reload();
+    });
+}
+
+// Close dropdown when clicking outside
+document.addEventListener('click', function(event) {
+    const bell = document.querySelector('.notification-bell');
+    const dropdown = document.getElementById('notificationDropdown');
+    
+    if (!bell.contains(event.target)) {
+        dropdown.classList.remove('show');
+    }
+});
+</script>

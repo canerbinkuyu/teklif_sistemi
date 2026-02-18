@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personel Kaydı</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+            width: 100%;
+            max-width: 500px;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+            text-align: center;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+            text-align: center;
+        }
+        
+        .info-box {
+            background: #e8f5e9;
+            border-left: 4px solid #4caf50;
+            padding: 15px;
+            margin-bottom: 25px;
+            border-radius: 6px;
+            font-size: 13px;
+            color: #2e7d32;
+            line-height: 1.6;
+        }
+        
+        .readonly-field {
+            background: #f8f9fa;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+        
+        .readonly-field label {
+            display: block;
+            color: #666;
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
+        
+        .readonly-field .value {
+            color: #333;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        
+        .required { color: #dc3545; }
+        
+        input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        small {
+            color: #999;
+            font-size: 12px;
+            display: block;
+            margin-top: 5px;
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .btn:hover { transform: translateY(-2px); }
+        
+        .messages { margin-bottom: 20px; }
+        .message {
+            padding: 12px 15px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        .message.error { background: #ffebee; color: #c62828; border-left: 4px solid #f44336; }
+    </style>
+</head>
+<body>
+    {% include 'includes/navbar.html' %}
+    <div class="container">
+        <h1>👤 Personel Kaydı</h1>
+        <p class="subtitle">Davetiyeniz onaylandı, kaydınızı tamamlayın</p>
+        
+        {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+            <div class="message {{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        
+        <div class="info-box">
+            <strong>✅ Davetiye Bilgileri</strong><br>
+            Aşağıdaki bilgiler yöneticiniz tarafından belirlenmiştir.
+        </div>
+        
+        <!-- Otomatik Dolu Bilgiler -->
+        <div class="readonly-field">
+            <label>Email Adresi</label>
+            <div class="value">{{ user.email }}</div>
+        </div>
+        
+        <div class="readonly-field">
+            <label>Ad Soyad</label>
+            <div class="value">{{ user.first_name }} {{ user.last_name }}</div>
+        </div>
+        
+        <div class="readonly-field">
+            <label>Rol</label>
+            <div class="value">
+                {% if user.role == 'firma' %}
+                    🏢 Firma Personeli
+                {% else %}
+                    💊 Eczane Personeli
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="readonly-field">
+            <label>Bağlı Olduğunuz Yönetici</label>
+            <div class="value">{{ user.manager.get_full_name }}</div>
+        </div>
+        
+        <!-- Kullanıcı Dolduracak Bilgiler -->
+        <form method="post">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label for="username">Kullanıcı Adı <span class="required">*</span></label>
+                <input 
+                    type="text" 
+                    name="username" 
+                    id="username" 
+                    required
+                    placeholder="kullaniciadi"
+                >
+                <small>Sisteme giriş yaparken kullanacağınız kullanıcı adı</small>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Şifre <span class="required">*</span></label>
+                <input 
+                    type="password" 
+                    name="password" 
+                    id="password" 
+                    required
+                    minlength="8"
+                >
+                <small>En az 8 karakter</small>
+            </div>
+            
+            <button type="submit" class="btn">✅ Kaydı Tamamla</button>
+        </form>
+    </div>
+</body>
+</html>

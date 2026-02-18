@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Onay Bekleniyor</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 500px;
+            width: 100%;
+        }
+
+        .approval-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            padding: 50px 40px;
+            text-align: center;
+        }
+
+        .icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+        }
+
+        h1 {
+            color: #2c3e50;
+            font-size: 28px;
+            margin-bottom: 15px;
+        }
+
+        p {
+            color: #7f8c8d;
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .info-box {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            text-align: left;
+        }
+
+        .info-box h3 {
+            color: #2c3e50;
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
+
+        .info-box ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .info-box li {
+            color: #7f8c8d;
+            font-size: 14px;
+            margin: 10px 0;
+            padding-left: 25px;
+            position: relative;
+        }
+
+        .info-box li::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #27ae60;
+            font-weight: bold;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .footer {
+            margin-top: 30px;
+            color: #95a5a6;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="approval-card">
+            <div class="icon">⏳</div>
+            <h1>Hesabınız Onay Bekliyor</h1>
+            <p>Kaydınız başarıyla oluşturuldu! Hesabınız yönetici tarafından onaylandıktan sonra sisteme giriş yapabileceksiniz.</p>
+
+            <div class="info-box">
+                <h3>📝 Sonraki Adımlar:</h3>
+                <ul>
+                    <li>Yönetici hesabınızı inceleyecek</li>
+                    <li>Onay işlemi genellikle 24 saat içinde tamamlanır</li>
+                    <li>Onaylandığınızda e-posta ile bilgilendirileceksiniz</li>
+                    <li>Onaydan sonra giriş yapabileceksiniz</li>
+                </ul>
+            </div>
+
+            <a href="{% url 'login' %}" class="btn">Giriş Sayfasına Dön</a>
+
+            <div class="footer">
+                Sorun mu yaşıyorsunuz? Lütfen yönetici ile iletişime geçin.
+            </div>
+        </div>
+    </div>
+</body>
+</html>

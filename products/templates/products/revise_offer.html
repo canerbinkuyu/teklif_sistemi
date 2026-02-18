@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teklif Revize Et</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .info-box {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border-left: 4px solid #007bff;
+        }
+
+        .info-box h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            color: #666;
+            font-weight: 500;
+        }
+
+        .info-value {
+            color: #333;
+            font-weight: 600;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-label {
+            display: block;
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #dee2e6;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: all 0.3s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 3px rgba(0,123,255,0.1);
+        }
+
+        textarea.form-control {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .help-text {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+            flex: 1;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,123,255,0.3);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #545b62;
+        }
+
+        .warning-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 25px;
+        }
+
+        .warning-box strong {
+            color: #856404;
+        }
+
+        .warning-box p {
+            color: #856404;
+            margin: 0;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    {% include 'includes/navbar.html' %}
+    <div class="container">
+        <div class="card">
+            <h1>🔄 Teklif Revize Et</h1>
+            <p class="subtitle">Teklif #{{ original_offer.id }} için yeni bir revizyon oluşturuyorsunuz</p>
+
+            <div class="warning-box">
+                <strong>⚠️ Dikkat!</strong>
+                <p>Revize ettiğinizde, orijinal teklifin tüm ürünleri kopyalanacak ve yeni bir taslak oluşturulacaktır. Taslak üzerinde değişiklik yapabilir ve tekrar gönderebilirsiniz.</p>
+            </div>
+
+            <div class="info-box">
+                <h3>📋 Mevcut Teklif Bilgileri</h3>
+                <div class="info-row">
+                    <span class="info-label">Teklif No</span>
+                    <span class="info-value">#{{ original_offer.id }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Durum</span>
+                    <span class="info-value">{{ original_offer.get_status_display }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Ürün Sayısı</span>
+                    <span class="info-value">{{ original_offer.items.count }} adet</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Toplam Tutar</span>
+                    <span class="info-value">{{ original_offer.total_price|floatformat:2 }} ₺</span>
+                </div>
+                {% if original_offer.revision_number > 1 %}
+                <div class="info-row">
+                    <span class="info-label">Mevcut Revizyon</span>
+                    <span class="info-value">Rev. #{{ original_offer.revision_number }}</span>
+                </div>
+                {% endif %}
+            </div>
+
+            <form method="post">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <label class="form-label" for="revision_note">
+                        📝 Revizyon Notu (İsteğe Bağlı)
+                    </label>
+                    <textarea 
+                        class="form-control" 
+                        id="revision_note" 
+                        name="revision_note" 
+                        placeholder="Bu revizyonda neler değiştiğini buraya yazabilirsiniz..."
+                    ></textarea>
+                    <div class="help-text">
+                        Örnek: "Ürün miktarlarını güncelliyorum" veya "Yeni ürünler ekliyorum"
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <a href="{% url 'my_offers' %}" class="btn btn-secondary">
+                        ← İptal
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        ✓ Revizyon Oluştur
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

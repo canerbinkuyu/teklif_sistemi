@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eczane Paneli</title>
+    <style>
+        .message.success { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .message.error { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .message.warning { background: #fff3cd; color: #856404; border-left: 4px solid #ffc107; }
+
+        /* Revision Badge */
+        .revision-badge {
+            display: inline-block;
+            background: #007bff;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+
+        /* Status Badges */
+        .status-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 11px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .status-sent {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-approved {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-rejected {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .stat-card-link {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .header-left h1 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        .header-left p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .logout-form {
+            display: inline;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            text-align: center;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+
+        .stat-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .stat-number {
+            font-size: 36px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .stat-pending {
+            border-left: 5px solid #ffc107;
+        }
+
+        .stat-pending .stat-number {
+            color: #ffc107;
+        }
+
+        .stat-approved {
+            border-left: 5px solid #28a745;
+        }
+
+        .stat-approved .stat-number {
+            color: #28a745;
+        }
+
+        .stat-rejected {
+            border-left: 5px solid #dc3545;
+        }
+
+        .stat-rejected .stat-number {
+            color: #dc3545;
+        }
+
+        .stat-total {
+            border-left: 5px solid #007bff;
+        }
+
+        .stat-total .stat-number {
+            color: #007bff;
+        }
+
+        /* Action Cards */
+        .action-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .action-card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            overflow: hidden;
+            transition: all 0.3s;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .action-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+        }
+
+        .action-header {
+            padding: 20px;
+            color: white;
+            text-align: center;
+        }
+
+        .action-header.inbox {
+            background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
+        }
+
+        .action-header.products {
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+        }
+
+        .action-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
+        .action-title {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .action-body {
+            padding: 20px;
+            text-align: center;
+        }
+
+        .action-description {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        .badge-count {
+            display: inline-block;
+            background: #dc3545;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        /* Recent Offers */
+        .recent-section {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .section-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .section-header h2 {
+            font-size: 20px;
+        }
+
+        .view-all-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 13px;
+            transition: all 0.3s;
+        }
+
+        .view-all-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .offers-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .offers-table thead {
+            background: #f8f9fa;
+        }
+
+        .offers-table thead th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 13px;
+            color: #333;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        .offers-table tbody tr {
+            border-bottom: 1px solid #f0f0f0;
+            transition: all 0.3s;
+        }
+
+        .offers-table tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        .offers-table tbody td {
+            padding: 15px;
+            vertical-align: middle;
+        }
+
+        .offer-id {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .company-name {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .date-time {
+            color: #666;
+            font-size: 13px;
+        }
+
+        .price {
+            font-weight: bold;
+            color: #28a745;
+        }
+
+        .action-btn {
+            padding: 8px 16px;
+            background: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 13px;
+            transition: all 0.3s;
+        }
+
+        .action-btn:hover {
+            background: #0056b3;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .empty-icon {
+            font-size: 64px;
+            margin-bottom: 15px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .action-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    {% include 'includes/navbar.html' %}
+    <div class="container">
+        {% if messages %}
+        <div class="messages" style="margin-bottom:20px;">
+            {% for message in messages %}
+            <div class="message {{ message.tags }}" style="padding:14px 18px; border-radius:8px; margin-bottom:10px;">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        
+        <!-- Header -->
+        <div class="header">
+            <a href="{% url 'profile' %}" class="btn btn-secondary">👤 Profil</a>
+            <div class="header-left">
+                <h1>👋 Hoş Geldiniz, {{ user.get_full_name|default:user.username }}</h1>
+                <p>Eczane Yönetim Paneli</p>
+            </div>
+            <form action="{% url 'logout' %}" method="POST" class="logout-form">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">🚪 Çıkış Yap</button>
+            </form>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="stats-grid">
+            <a href="{% url 'pharmacy_offers_by_status' 'sent' %}" class="stat-card-link">
+                <div class="stat-card stat-pending">
+                    <div class="stat-icon">⏳</div>
+                    <div class="stat-number">{{ stats.pending }}</div>
+                    <div class="stat-label">Bekleyen Teklif</div>
+                </div>
+            </a>
+
+            <a href="{% url 'pharmacy_offers_by_status' 'approved' %}" class="stat-card-link">
+                <div class="stat-card stat-approved">
+                    <div class="stat-icon">✅</div>
+                    <div class="stat-number">{{ stats.approved }}</div>
+                    <div class="stat-label">Onaylanan</div>
+                </div>
+            </a>
+
+            <a href="{% url 'pharmacy_offers_by_status' 'rejected' %}" class="stat-card-link">
+                <div class="stat-card stat-rejected">
+                    <div class="stat-icon">❌</div>
+                    <div class="stat-number">{{ stats.rejected }}</div>
+                    <div class="stat-label">Reddedilen</div>
+                </div>
+            </a>
+
+            <div class="stat-card stat-total">
+                <div class="stat-icon">📊</div>
+                <div class="stat-number">{{ stats.total }}</div>
+                <div class="stat-label">Toplam Teklif</div>
+            </div>
+        </div>
+
+        <!-- Action Cards -->
+        <div class="action-grid">
+            <a href="{% url 'pharmacy_inbox' %}" class="action-card">
+                <div class="action-header inbox">
+                    <div class="action-icon">📬</div>
+                    <div class="action-title">Gelen Teklifler</div>
+                </div>
+                <div class="action-body">
+                    <p class="action-description">
+                        Firmaların gönderdiği teklif taleplerini görüntüleyin ve yanıtlayın
+                    </p>
+                    {% if new_offers_count > 0 %}
+                    <span class="badge-count">{{ new_offers_count }} Yeni Teklif</span>
+                    {% else %}
+                    <span style="color: #999;">Yeni teklif yok</span>
+                    {% endif %}
+                </div>
+            </a>
+
+            {% if user.is_manager %}
+            <a href="{% url 'pharmacist_staff_list' %}" class="action-card">
+                <div class="action-header" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%);">
+                    <div class="action-icon">👥</div>
+                    <div class="action-title">Personellerim</div>
+                </div>
+                <div class="action-body">
+                    <p class="action-description">
+                        Eczane personellerinizi yönetin ve onaylayın
+                    </p>
+                    <span style="color: #999;">Personel listesine git</span>
+                </div>
+            </a>
+            {% endif %}
+
+            <a href="{% url 'pharmacy_product_management' %}" class="action-card">
+                <div class="action-header products">
+                    <div class="action-icon">💊</div>
+                    <div class="action-title">Ürün Yönetimi</div>
+                </div>
+                <div class="action-body">
+                    <p class="action-description">
+                        Ürünleri görüntüleyin, ekleyin veya düzenleyin
+                    </p>
+                    <span style="color: #999;">Ürün kataloğuna git</span>
+                </div>
+            </a>
+        </div>
+
+        <!-- Recent Offers -->
+        <div class="recent-section">
+            <div class="section-header">
+                <h2>🕒 Son Gelen Teklifler</h2>
+                <a href="{% url 'pharmacy_inbox' %}" class="view-all-btn">Tümünü Gör →</a>
+            </div>
+
+            {% if recent_offers %}
+            <table class="offers-table">
+                <thead>
+                    <tr>
+                        <th>Teklif No</th>
+                        <th>Firma</th>
+                        <th>Tarih</th>
+                        <th style="text-align: center;">Durum</th>
+                        <th>Ürün Sayısı</th>
+                        <th>Toplam</th>
+                        <th>İşlem</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for offer in recent_offers %}
+                    <tr>
+                        <td>
+                            <span class="offer-id">
+                                #{% if offer.original_offer %}{{ offer.original_offer.id }}{% else %}{{ offer.id }}{% endif %}
+                            </span>
+                            {% if offer.revision_number > 1 %}
+                                <span class="revision-badge">🔄 Rev.{{ offer.revision_number }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="company-name">{{ offer.user.get_full_name|default:offer.user.username }}</div>
+                        </td>
+                        <td>
+                            <div class="date-time">{{ offer.sent_at|date:"d.m.Y H:i" }}</div>
+                        </td>
+                        <td style="text-align: center;">
+                            {% if offer.status == 'sent' %}
+                                <span class="status-badge status-sent">⏳ Bekliyor</span>
+                            {% elif offer.status == 'approved' %}
+                                <span class="status-badge status-approved">✅ Onaylandı</span>
+                            {% elif offer.status == 'rejected' %}
+                                <span class="status-badge status-rejected">❌ Reddedildi</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ offer.items.count }} adet</td>
+                        <td>
+                            <span class="price">{{ offer.gross_total_price|floatformat:2 }} ₺</span>
+                        </td>
+                        <td>
+                            <a href="{% url 'pharmacy_offer_detail' offer.id %}" class="action-btn">İncele</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-icon">📭</div>
+                <p>Henüz gelen teklif yok</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

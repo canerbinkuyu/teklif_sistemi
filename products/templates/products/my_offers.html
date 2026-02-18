@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8"><title>Tekliflerim</title></head>
+<body>
+<h2>Tekliflerim</h2>
+
+{% if offers %}
+  <ul>
+    {% for o in offers %}
+      <li>
+        <a href="{% url 'my_offer_detail' o.id %}">Teklif #{{ o.id }}</a>
+        — {{ o.get_status_display }} — {{ o.created_at }}
+      </li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p>Henüz teklif yok.</p>
+{% endif %}
+
+<hr>
+<a href="{% url 'product_list' %}">← Ürün listesine dön</a>
+</body>
+</html>

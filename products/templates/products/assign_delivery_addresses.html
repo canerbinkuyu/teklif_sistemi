@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teslimat Adresi Seçimi - Teklif #{{ offer.id }}</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container { max-width: 1200px; margin: 0 auto; }
+        
+        .header {
+            background: white;
+            padding: 25px 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header h1 { color: #333; font-size: 24px; }
+        
+        .btn {
+            padding: 10px 20px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+        
+        .btn-secondary { background: #6c757d; color: white; }
+        .btn-secondary:hover { background: #545b62; }
+        
+        .info-box {
+            background: #e8f5e9;
+            border-left: 4px solid #4caf50;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .info-box h3 {
+            color: #2e7d32;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        
+        .info-box p {
+            color: #2e7d32;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        
+        .products-section {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .section-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 25px;
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .product-item {
+            padding: 20px 25px;
+            border-bottom: 1px solid #f0f0f0;
+            display: grid;
+            grid-template-columns: 1fr 1fr 200px;
+            gap: 20px;
+            align-items: center;
+        }
+        
+        .product-item:last-child { border-bottom: none; }
+        
+        .product-info h4 {
+            color: #333;
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+        
+        .product-info p {
+            color: #666;
+            font-size: 13px;
+        }
+        
+        .quantity-info {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .address-select {
+            position: relative;
+        }
+        
+        .address-select select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+            cursor: pointer;
+            transition: border-color 0.3s;
+        }
+        
+        .address-select select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .save-section {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-top: 20px;
+            text-align: center;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 14px 40px;
+            font-size: 16px;
+            font-weight: 600;
+        }
+        
+        .btn-primary:hover { opacity: 0.9; }
+        
+        .no-addresses {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .no-addresses h3 {
+            color: #856404;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        
+        .no-addresses p {
+            color: #856404;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+        
+        .btn-warning {
+            background: #ffc107;
+            color: #333;
+            padding: 10px 20px;
+        }
+        
+        .btn-warning:hover { background: #e0a800; }
+        
+        .messages { margin-bottom: 20px; }
+        .message {
+            padding: 14px 18px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+        .message.success { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+    </style>
+</head>
+<body>
+    {% include 'includes/navbar.html' %}
+    <div class="container">
+        <div class="header">
+            <h1>📍 Teslimat Adresi Seçimi - Teklif #{{ offer.id }}</h1>
+            <a href="{% url 'my_offer_detail' offer.id %}" class="btn btn-secondary">← Geri</a>
+        </div>
+        
+        {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+            <div class="message {{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        
+        <div class="info-box">
+            <h3>ℹ️ Teslimat Adresi Bilgilendirmesi</h3>
+            <p>Onaylanan teklifiniz için her ürüne teslimat adresi atayabilirsiniz. Farklı ürünler farklı adreslere gönderilebilir.</p>
+        </div>
+        
+        {% if not firm_addresses %}
+        <div class="no-addresses">
+            <h3>⚠️ Henüz Adres Eklenmemiş</h3>
+            <p>Teslimat adresi seçebilmek için önce adres eklemeniz gerekiyor.</p>
+            <a href="{% url 'address_create' %}" class="btn btn-warning">+ Adres Ekle</a>
+        </div>
+        {% else %}
+        
+        <form method="post">
+            {% csrf_token %}
+            
+            <div class="products-section">
+                <div class="section-header">📦 Ürünler ve Teslimat Adresleri</div>
+                
+                {% for item in offer.items.all %}
+                <div class="product-item">
+                    <div class="product-info">
+                        <h4>{{ item.product.name }}</h4>
+                        <p>Birim Fiyat: {{ item.unit_price }} ₺</p>
+                    </div>
+                    
+                    <div class="quantity-info">
+                        <strong>Miktar:</strong> {{ item.quantity }} adet
+                    </div>
+                    
+                    <div class="address-select">
+                        <select name="address_{{ item.id }}" required>
+                            <option value="">Adres Seçin...</option>
+                            {% for address in firm_addresses %}
+                            <option value="{{ address.id }}" {% if item.delivery_address and item.delivery_address.id == address.id %}selected{% endif %}>
+                                {{ address.title }} ({{ address.get_address_type_display }})
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <div class="save-section">
+                <button type="submit" class="btn btn-primary">💾 Teslimat Adreslerini Kaydet</button>
+            </div>
+        </form>
+        
+        {% endif %}
+    </div>
+</body>
+</html>

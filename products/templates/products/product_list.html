@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ürün Listesi - Teklif Oluştur</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+        }
+
+        /* Favori Butonu CSS */
+        .btn-favorite {
+            background: none;
+            border: 2px solid #ffc107;
+            color: #ffc107;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 18px;
+            transition: all 0.3s;
+        }
+        .btn-favorite:hover {
+            background: #ffc107;
+            transform: scale(1.1);
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            padding: 20px 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 24px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        /* Cart Button with Preview */
+        .cart-wrapper {
+            position: relative;
+        }
+
+        .cart-btn {
+            position: relative;
+            padding: 10px 20px;
+            background: #28a745;
+            color: white;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+
+        .cart-btn:hover {
+            background: #218838;
+            transform: scale(1.05);
+        }
+
+        .cart-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #dc3545;
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        /* Cart Preview */
+        .cart-preview {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 10px;
+            width: 350px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+
+        .cart-wrapper:hover .cart-preview {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .cart-preview-header {
+            padding: 15px 20px;
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            border-radius: 12px 12px 0 0;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .cart-preview-items {
+            max-height: 300px;
+            overflow-y: auto;
+            padding: 10px;
+        }
+
+        .cart-preview-item {
+            padding: 10px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .cart-preview-item:last-child {
+            border-bottom: none;
+        }
+
+        .cart-item-name {
+            flex: 1;
+            font-size: 13px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .cart-item-quantity {
+            color: #666;
+            font-size: 12px;
+            margin-right: 10px;
+        }
+
+        .cart-item-price {
+            color: #28a745;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .cart-preview-footer {
+            padding: 15px 20px;
+            border-top: 2px solid #f0f0f0;
+            background: #f8f9fa;
+            border-radius: 0 0 12px 12px;
+        }
+
+        .cart-preview-total {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .cart-preview-total-label {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .cart-preview-total-amount {
+            font-size: 18px;
+            font-weight: bold;
+            color: #28a745;
+        }
+
+        .cart-preview-action {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background: #007bff;
+            color: white;
+            text-align: center;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .cart-preview-action:hover {
+            background: #0056b3;
+        }
+
+        .cart-preview-empty {
+            padding: 40px 20px;
+            text-align: center;
+            color: #999;
+        }
+
+        .cart-preview-empty-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #545b62;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        /* Search Section */
+        .search-section {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .search-form {
+            display: flex;
+            gap: 10px;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 12px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 15px;
+            transition: all 0.3s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 3px rgba(0,123,255,0.1);
+        }
+
+        .search-btn {
+            padding: 12px 30px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .search-btn:hover {
+            background: #0056b3;
+        }
+
+        .clear-btn {
+            padding: 12px 20px;
+            background: #6c757d;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .clear-btn:hover {
+            background: #545b62;
+        }
+
+        .search-info {
+            margin-top: 15px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        /* Stats Bar */
+        .stats-bar {
+            background: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .stat-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #007bff;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 14px;
+        }
+
+        /* Table Container */
+        .table-container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .table-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+        }
+
+        .table-header h2 {
+            font-size: 20px;
+        }
+
+        .products-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .products-table thead {
+            background: #f8f9fa;
+        }
+
+        .products-table thead th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 13px;
+            color: #333;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        .products-table tbody tr {
+            border-bottom: 1px solid #f0f0f0;
+            transition: all 0.3s;
+        }
+
+        .products-table tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        .products-table tbody td {
+            padding: 15px;
+            vertical-align: middle;
+        }
+
+        .product-name {
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .product-image-cell {
+            text-align: center;
+        }
+
+        .product-image-thumb {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 2px solid #e0e0e0;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .product-image-thumb:hover {
+            transform: scale(1.1);
+            border-color: #007bff;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .no-image-placeholder {
+            width: 60px;
+            height: 60px;
+            background: #f0f0f0;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: #ccc;
+        }
+
+        .price {
+            font-weight: bold;
+            color: #28a745;
+            font-size: 16px;
+        }
+
+        .quantity-input {
+            width: 70px;
+            padding: 8px;
+            border: 2px solid #e0e0e0;
+            border-radius: 5px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .quantity-input:focus {
+            outline: none;
+            border-color: #007bff;
+        }
+
+        .add-to-cart-btn {
+            padding: 10px 24px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .add-to-cart-btn:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        .add-to-cart-btn:active {
+            transform: translateY(0);
+        }
+
+        /* Success feedback */
+        .add-to-cart-btn.added {
+            background: #28a745;
+            pointer-events: none;
+        }
+
+        .add-to-cart-btn.added::after {
+            content: " ✓";
+        }
+
+        /* Pagination */
+        .pagination {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .pagination a,
+        .pagination span {
+            padding: 10px 15px;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .pagination a:hover {
+            background: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+
+        .pagination .current {
+            background: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+
+        .pagination .disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+
+        .empty-state h3 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .empty-state p {
+            color: #666;
+        }
+
+        /* Messages */
+        .messages {
+            margin-bottom: 20px;
+        }
+
+        .message {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border-left: 4px solid #28a745;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .cart-preview {
+                width: 300px;
+                right: -50px;
+            }
+
+            .products-table {
+                font-size: 12px;
+            }
+
+            .products-table thead th,
+            .products-table tbody td {
+                padding: 8px;
+            }
+
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    {% include 'includes/navbar.html' %}
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🛍️ Ürün Kataloğu</h1>
+            <div class="header-actions">
+                <a href="{% url 'my_offers' %}" class="btn btn-secondary">← Ana Sayfa</a>
+                
+                <!-- FAVORİ ÜRÜNLER LİNKİ -->
+                <a href="{% url 'favorite_products' %}" class="btn" style="background:#ffc107; color:#333;">⭐ Favoriler</a>
+                
+                <!-- Sepet Butonu with Preview -->
+                <div class="cart-wrapper">
+                    <a href="{% url 'offer' %}" class="cart-btn">
+                        🛒 Sepetim
+                        {% if cart_count > 0 %}
+                        <span class="cart-badge">{{ cart_count }}</span>
+                        {% endif %}
+                    </a>
+                    
+                    <!-- Cart Preview -->
+                    <div class="cart-preview">
+                        <div class="cart-preview-header">
+                            <span>🛒 Sepetim</span>
+                            <span>{{ cart_count }} Ürün</span>
+                        </div>
+                        
+                        {% if cart_items %}
+                        <div class="cart-preview-items">
+                            {% for item in cart_items %}
+                            <div class="cart-preview-item">
+                                <div class="cart-item-name">{{ item.product.name|truncatechars:30 }}</div>
+                                <div class="cart-item-quantity">x{{ item.quantity }}</div>
+                                <div class="cart-item-price">{{ item.gross_total_price|floatformat:2 }} ₺</div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <div class="cart-preview-footer">
+                            <div class="cart-preview-total">
+                                <span class="cart-preview-total-label">Toplam:</span>
+                                <span class="cart-preview-total-amount">{{ cart_total|floatformat:2 }} ₺</span>
+                            </div>
+                            <a href="{% url 'offer' %}" class="cart-preview-action">
+                                Sepete Git →
+                            </a>
+                        </div>
+                        {% else %}
+                        <div class="cart-preview-empty">
+                            <div class="cart-preview-empty-icon">🛒</div>
+                            <p>Sepetiniz boş</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <form action="{% url 'logout' %}" method="post" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">🚪 Çıkış</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Messages -->
+        {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+            <div class="message {{ message.tags }}">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Search Section -->
+        <div class="search-section">
+            <form method="get" class="search-form">
+                <input 
+                    type="text" 
+                    name="search"
+                    value="{{ search_query }}"
+                    class="search-input" 
+                    placeholder="🔍 İlaç adı veya barkod ile arayın..."
+                    autocomplete="off"
+                >
+                <button type="submit" class="search-btn">🔍 Ara</button>
+                {% if search_query %}
+                <a href="{% url 'product_list' %}" class="clear-btn">✖ Temizle</a>
+                {% endif %}
+            </form>
+            <div class="search-info">
+                {% if search_query %}
+                    <strong>{{ total_count }}</strong> ürün bulundu: "{{ search_query }}"
+                {% else %}
+                    Toplam <strong>{{ total_count }}</strong> ürün listeleniyor
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Stats Bar -->
+        <div class="stats-bar">
+            <div class="stat-item">
+                <div>
+                    <div class="stat-number">{{ products.paginator.count }}</div>
+                    <div class="stat-label">Toplam Ürün</div>
+                </div>
+            </div>
+            <div class="stat-item">
+                <div>
+                    <div class="stat-number">{{ products.number }}</div>
+                    <div class="stat-label">Sayfa {{ products.number }} / {{ products.paginator.num_pages }}</div>
+                </div>
+            </div>
+            {% if cart_count > 0 %}
+            <div class="stat-item">
+                <div>
+                    <div class="stat-number" style="color: #28a745;">{{ cart_count }}</div>
+                    <div class="stat-label">Sepetimde</div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Products Table -->
+        <div class="table-container">
+            <div class="table-header">
+                <h2>📦 Ürünler ({{ products.start_index }}-{{ products.end_index }} arası gösteriliyor)</h2>
+            </div>
+
+            {% if products %}
+            <table class="products-table">
+                <thead>
+                    <tr>
+                        <th style="text-align: center;">Görsel</th>
+                        <th>Barkod</th>
+                        <th>Ürün Adı</th>
+                        <th>Birim Fiyat<br><small style="color:#999;">(KDV Dahil)</small></th>
+                        <th>Birim Fiyat<br><small style="color:#999;">(KDV Hariç)</small></th>
+                        <th>KDV %</th>
+                        <th style="text-align: center;">Favori</th>
+                        <th style="text-align: center;">Adet</th>
+                        <th style="text-align: center;">İşlem</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for product in products %}
+                    <tr id="product-{{ product.id }}">
+                        <!-- GÖRSEL -->
+                        <td class="product-image-cell">
+                            {% if product.image %}
+                                <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-image-thumb" title="{{ product.name }}">
+                            {% else %}
+                                <div class="no-image-placeholder">📦</div>
+                            {% endif %}
+                        </td>
+                        
+                        <td>
+                            {% if product.barcode %}
+                                <code style="background: #f5f5f5; padding: 3px 8px; border-radius: 4px; font-size: 12px;">
+                                    {{ product.barcode }}
+                                </code>
+                            {% else %}
+                                <span style="color: #999;">-</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="product-name">{{ product.name }}</div>
+                        </td>
+                        <td>
+                            <span class="price">{{ product.price|floatformat:2 }} ₺</span>
+                        </td>
+                        <td>
+                            <span class="price" style="color: #007bff;">{{ product.price_without_vat|floatformat:2 }} ₺</span>
+                        </td>
+                        <td>%{{ product.vat_rate }}</td>
+                        
+                        <!-- FAVORİ BUTONU -->
+                        <td style="text-align: center;">
+                            <form action="{% url 'toggle_favorite_product' product.id %}" method="post" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn-favorite">⭐</button>
+                            </form>
+                        </td>
+                        
+                        <td style="text-align: center;">
+                            <input
+                                type="number"
+                                id="qty-{{ product.id }}"
+                                value="1"
+                                min="1"
+                                max="9999"
+                                class="quantity-input"
+                            >
+                        </td>
+                        <td style="text-align: center;">
+                            <button 
+                                class="add-to-cart-btn" 
+                                id="btn-{{ product.id }}"
+                                onclick="addToCart({{ product.id }})"
+                            >
+                                🛒 Sepete Ekle
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-state-icon">🔍</div>
+                <h3>Ürün Bulunamadı</h3>
+                <p>Arama kriterinize uygun ürün bulunamadı.</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Pagination -->
+        {% if products.paginator.num_pages > 1 %}
+        <div class="pagination">
+            {% if products.has_previous %}
+                <a href="?page=1{% if search_query %}&search={{ search_query }}{% endif %}">« İlk</a>
+                <a href="?page={{ products.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}">‹ Önceki</a>
+            {% else %}
+                <span class="disabled">« İlk</span>
+                <span class="disabled">‹ Önceki</span>
+            {% endif %}
+
+            <span class="current">
+                Sayfa {{ products.number }} / {{ products.paginator.num_pages }}
+            </span>
+
+            {% if products.has_next %}
+                <a href="?page={{ products.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}">Sonraki ›</a>
+                <a href="?page={{ products.paginator.num_pages }}{% if search_query %}&search={{ search_query }}{% endif %}">Son »</a>
+            {% else %}
+                <span class="disabled">Sonraki ›</span>
+                <span class="disabled">Son »</span>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+
+    <script>
+        function addToCart(productId) {
+            const quantity = document.getElementById('qty-' + productId).value;
+            const button = document.getElementById('btn-' + productId);
+            
+            // Form oluştur ve gönder
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '/products/add/' + productId + '/';
+            
+            const csrfToken = '{{ csrf_token }}';
+            const csrfInput = document.createElement('input');
+            csrfInput.type = 'hidden';
+            csrfInput.name = 'csrfmiddlewaretoken';
+            csrfInput.value = csrfToken;
+            form.appendChild(csrfInput);
+            
+            const qtyInput = document.createElement('input');
+            qtyInput.type = 'hidden';
+            qtyInput.name = 'quantity';
+            qtyInput.value = quantity;
+            form.appendChild(qtyInput);
+            
+            document.body.appendChild(form);
+            
+            // Buton feedback
+            button.classList.add('added');
+            button.textContent = 'Eklendi';
+            
+            setTimeout(() => {
+                form.submit();
+            }, 500);
+        }
+    </script>
+</body>
+</html>

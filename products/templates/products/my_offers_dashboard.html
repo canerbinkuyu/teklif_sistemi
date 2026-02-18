@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tekliflerim - Dashboard</title>
+    <style>
+        /* Mevcut CSS'ler */
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tekliflerim - {% if is_manager %}Yönetici{% else %}Personel{% endif %}</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container { max-width: 1400px; margin: 0 auto; }
+
+        /* Header */
+        .header {
+            background: white;
+            padding: 25px 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 { color: #333; font-size: 24px; }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+
+        .btn-primary { background: #007bff; color: white; }
+        .btn-primary:hover { background: #0056b3; }
+
+        .btn-secondary { background: #6c757d; color: white; }
+        .btn-secondary:hover { background: #545b62; }
+
+        .btn-danger { background: #dc3545; color: white; }
+        .btn-danger:hover { background: #c82333; }
+
+        /* Stats */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+
+        .stat-number { font-size: 32px; font-weight: bold; color: #333; }
+        .stat-label { color: #666; font-size: 13px; margin-top: 5px; }
+
+        /* Rest of the styles remain the same... */
+        .pending-section {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .pending-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .pending-header h3 {
+            color: #856404;
+            font-size: 18px;
+        }
+
+        .pending-count {
+            background: #ffc107;
+            color: #333;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+
+        .approval-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .approval-card:last-child { margin-bottom: 0; }
+
+        .approval-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .approval-info h4 {
+            color: #333;
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+
+        .approval-info p {
+            color: #666;
+            font-size: 13px;
+        }
+
+        .approval-amount {
+            font-size: 24px;
+            font-weight: bold;
+            color: #dc3545;
+        }
+
+        .approval-details {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+        }
+
+        .approval-detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .approval-detail-row:last-child { margin-bottom: 0; }
+
+        .approval-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-approve { background: #28a745; color: white; flex: 1; }
+        .btn-approve:hover { background: #218838; }
+
+        .btn-reject { background: #dc3545; color: white; flex: 1; }
+        .btn-reject:hover { background: #c82333; }
+
+        .btn-view { background: #007bff; color: white; flex: 1; }
+        .btn-view:hover { background: #0056b3; }
+
+        .offers-section {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .section-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .section-header h2 { font-size: 20px; }
+
+        .offers-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .offers-table thead { background: #f8f9fa; }
+
+        .offers-table thead th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 13px;
+            color: #333;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        .offers-table tbody tr {
+            border-bottom: 1px solid #f0f0f0;
+            transition: all 0.3s;
+        }
+
+        .offers-table tbody tr:hover { background: #f8f9fa; }
+
+        .offers-table tbody td {
+            padding: 15px;
+            vertical-align: middle;
+        }
+
+        .badge {
+            padding: 5px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-sent { background: #fff3cd; color: #856404; }
+        .badge-approved { background: #d4edda; color: #155724; }
+        .badge-rejected { background: #f8d7da; color: #721c24; }
+
+        .view-btn {
+            padding: 8px 16px;
+            background: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .view-btn:hover { background: #0056b3; }
+
+        .messages { margin-bottom: 20px; }
+        .message {
+            padding: 14px 18px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+        .message.success { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .message.warning { background: #fff3cd; color: #856404; border-left: 4px solid #ffc107; }
+        .message.error { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .empty-icon { font-size: 64px; margin-bottom: 15px; }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background: white;
+            margin: 10% auto;
+            padding: 30px;
+            border-radius: 10px;
+            max-width: 500px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .modal-header {
+            margin-bottom: 20px;
+        }
+
+        .modal-header h3 {
+            color: #333;
+            font-size: 20px;
+        }
+
+        .modal-body textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 14px;
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .modal-footer {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .btn-cancel {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-cancel:hover {
+            background: #545b62;
+        }
+    </style>
+</head>
+<body>
+    <body>
+    {% include 'includes/navbar.html' %}
+    
+    <div class="container">
+        <!-- Mevcut içerik -->
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>📋 Tekliflerim {% if is_manager %}<small style="color:#28a745;">(Yönetici)</small>{% endif %}</h1>
+            <div class="header-actions">
+                <a href="{% url 'product_list' %}" class="btn btn-primary">+ Yeni Teklif</a>
+                {% if user.is_manager or user.can_export_data %}
+                <a href="{% url 'export_offers_excel' %}" class="btn btn-secondary">📥 Excel İndir</a>
+                {% endif %}
+                <form action="{% url 'logout' %}" method="post" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">🚪 Çıkış</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Messages -->
+        {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+            <div class="message {{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number">{{ stats.total }}</div>
+                <div class="stat-label">Toplam Teklif</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" style="color:#ffc107;">{{ stats.sent }}</div>
+                <div class="stat-label">Bekleyen</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" style="color:#28a745;">{{ stats.approved }}</div>
+                <div class="stat-label">Onaylanan</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" style="color:#dc3545;">{{ stats.rejected }}</div>
+                <div class="stat-label">Reddedilen</div>
+            </div>
+            {% if is_manager %}
+            <div class="stat-card">
+                <div class="stat-number" style="color:#ff6b6b;">{{ stats.pending_approval }}</div>
+                <div class="stat-label">Onay Bekleyen</div>
+            </div>
+            <!-- YENİ: PERSONEL YÖNETİMİ KARTI -->
+            <a href="{% url 'my_staff' %}" style="text-decoration:none; color:inherit;">
+                <div class="stat-card" style="border-left: 5px solid #28a745; cursor:pointer;">
+                    <div style="font-size:36px; margin-bottom:10px;">👥</div>
+                    <div class="stat-label">Personel Yönetimi</div>
+                </div>
+            </a>
+            {% endif %}
+        </div>
+
+        <!-- Pending Approvals (Only for Managers) -->
+        {% if is_manager and pending_approvals %}
+        <div class="pending-section">
+            <div class="pending-header">
+                <h3>⏳ Onay Bekleyen Teklifler</h3>
+                <span class="pending-count">{{ pending_approvals.count }}</span>
+            </div>
+
+            {% for offer in pending_approvals %}
+            <div class="approval-card">
+                <div class="approval-header">
+                    <div class="approval-info">
+                        <h4>Teklif #{{ offer.id }}</h4>
+                        <p>👤 {{ offer.user.get_full_name|default:offer.user.username }} • 📅 {{ offer.created_at|date:"d.m.Y H:i" }}</p>
+                    </div>
+                    <div class="approval-amount">{{ offer.gross_total_price|floatformat:2 }} ₺</div>
+                </div>
+
+                <div class="approval-details">
+                    <div class="approval-detail-row">
+                        <span><strong>Ürün Sayısı:</strong></span>
+                        <span>{{ offer.items.count }} adet</span>
+                    </div>
+                    <div class="approval-detail-row">
+                        <span><strong>KDV Hariç:</strong></span>
+                        <span>{{ offer.net_total_price|floatformat:2 }} ₺</span>
+                    </div>
+                    <div class="approval-detail-row">
+                        <span><strong>KDV Dahil:</strong></span>
+                        <span>{{ offer.gross_total_price|floatformat:2 }} ₺</span>
+                    </div>
+                </div>
+
+                <div class="approval-actions">
+                    <form method="post" action="{% url 'manager_approve_offer' offer.id %}" style="flex:1;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-approve" onclick="return confirm('Bu teklifi onaylayıp eczaneye göndermek istediğinize emin misiniz?')">
+                            ✅ Onayla & Gönder
+                        </button>
+                    </form>
+                    
+                    <button class="btn btn-reject" onclick="openRejectModal({{ offer.id }})">
+                        ❌ Reddet
+                    </button>
+                    
+                    <a href="{% url 'my_offer_detail' offer.id %}" class="btn btn-view view-btn">
+                        👁️ Detay
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Offers List -->
+        <div class="offers-section">
+            <div class="section-header">
+                <h2>📋 {% if is_manager %}Tüm Teklifler{% else %}Tekliflerim{% endif %} ({{ offers.count }})</h2>
+            </div>
+
+            {% if offers %}
+            <table class="offers-table">
+                <thead>
+                    <tr>
+                        <th>Teklif No</th>
+                        {% if is_manager %}<th>Personel</th>{% endif %}
+                        <th>Durum</th>
+                        <th>Ürün</th>
+                        <th>Toplam</th>
+                        <th>Tarih</th>
+                        <th>İşlem</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for offer in offers %}
+                    <tr>
+                        <td>
+                            <strong>
+                                #{% if offer.original_offer %}{{ offer.original_offer.id }}{% else %}{{ offer.id }}{% endif %}
+                                {% if offer.revision_number > 1 %}
+                                    <span style="color:#007bff; font-size:11px;">(Rev.{{ offer.revision_number }})</span>
+                                {% endif %}
+                            </strong>
+                        </td>
+                        {% if is_manager %}
+                        <td>{{ offer.user.get_full_name|default:offer.user.username }}</td>
+                        {% endif %}
+                        <td>
+                            {% if offer.status == 'sent' %}
+                                <span class="badge badge-sent">⏳ Bekliyor</span>
+                            {% elif offer.status == 'approved' %}
+                                <span class="badge badge-approved">✅ Onaylandı</span>
+                            {% elif offer.status == 'rejected' %}
+                                <span class="badge badge-rejected">❌ Reddedildi</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ offer.items.count }} adet</td>
+                        <td><strong>{{ offer.gross_total_price|floatformat:2 }} ₺</strong></td>
+                        <td>{{ offer.created_at|date:"d.m.Y H:i" }}</td>
+                        <td>
+                            <a href="{% url 'my_offer_detail' offer.id %}" class="view-btn">👁️ Detay</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-icon">📭</div>
+                <h3>Henüz teklif yok</h3>
+                <p>Yeni teklif oluşturmak için "Yeni Teklif" butonuna tıklayın.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Reject Modal -->
+    <div id="rejectModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>❌ Teklifi Reddet</h3>
+            </div>
+            <form id="rejectForm" method="post">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <label for="reason" style="display:block; margin-bottom:8px; color:#333; font-weight:600;">Red Sebebi:</label>
+                    <textarea name="reason" id="reason" required placeholder="Reddetme sebebinizi yazın..."></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-cancel" onclick="closeRejectModal()">İptal</button>
+                    <button type="submit" class="btn btn-reject">Reddet</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function openRejectModal(offerId) {
+            const modal = document.getElementById('rejectModal');
+            const form = document.getElementById('rejectForm');
+            form.action = '/products/offers/' + offerId + '/manager-reject/';
+            modal.style.display = 'block';
+        }
+
+        function closeRejectModal() {
+            const modal = document.getElementById('rejectModal');
+            modal.style.display = 'none';
+            document.getElementById('reason').value = '';
+        }
+
+        window.onclick = function(event) {
+            const modal = document.getElementById('rejectModal');
+            if (event.target == modal) {
+                closeRejectModal();
+            }
+        }
+    </script>
+</body>
+</html>

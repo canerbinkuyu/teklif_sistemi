@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Favori Taslaklar</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container { max-width: 1200px; margin: 0 auto; }
+
+        .header {
+            background: white;
+            padding: 20px 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .header h1 { color: #333; font-size: 24px; }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .btn-primary { background: #007bff; color: white; }
+        .btn-primary:hover { background: #0056b3; }
+
+        .drafts-list { display: flex; flex-direction: column; gap: 15px; }
+
+        .draft-card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .draft-info h3 { color: #333; font-size: 18px; margin-bottom: 8px; }
+        .draft-meta { color: #666; font-size: 14px; margin-bottom: 5px; }
+        .draft-note {
+            margin-top: 10px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-left: 3px solid #667eea;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #555;
+        }
+
+        .draft-actions { display: flex; gap: 10px; flex-shrink: 0; }
+
+        .btn-view {
+            background: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 6px;
+            text-decoration: none;
+        }
+
+        .btn-view:hover { background: #0056b3; }
+
+        .btn-unfavorite {
+            background: #dc3545;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-unfavorite:hover { background: #c82333; }
+
+        .empty-state {
+            background: white;
+            padding: 60px 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .empty-icon { font-size: 64px; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+
+        <div class="header">
+            <h1>⭐ Favori Taslaklar</h1>
+            <a href="{% url 'offer' %}" class="btn btn-primary">← Sepete Dön</a>
+        </div>
+
+        {% if favorites %}
+        <div class="drafts-list">
+            {% for fav in favorites %}
+            <div class="draft-card">
+                <div class="draft-info">
+                    <h3>📋 Teklif #{{ fav.offer.id }}</h3>
+                    <div class="draft-meta">🕒 Oluşturulma: {{ fav.offer.created_at|date:"d.m.Y H:i" }}</div>
+                    <div class="draft-meta">📦 {{ fav.offer.items.count }} Ürün</div>
+                    <div class="draft-meta">💰 Toplam: {{ fav.offer.gross_total_price|floatformat:2 }} ₺</div>
+                    
+                    {% if fav.note %}
+                    <div class="draft-note">
+                        <strong>📝 Not:</strong> {{ fav.note }}
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="draft-actions">
+                    <a href="{% url 'offer' %}" class="btn-view">👁️ Görüntüle</a>
+                    
+                    <form action="{% url 'toggle_favorite_draft' fav.offer.id %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="btn-unfavorite" title="Favorilerden çıkar">❌</button>
+                    </form>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">⭐</div>
+            <h2 style="color:#333;">Favori taslağınız yok</h2>
+            <p style="color:#666; margin-top:10px;">Sepetten taslak olarak favorilere ekleyebilirsiniz.</p>
+        </div>
+        {% endif %}
+
+    </div>
+</body>
+</html>

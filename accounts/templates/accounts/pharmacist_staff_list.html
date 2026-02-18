@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eczane Personellerim</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container { max-width: 1200px; margin: 0 auto; }
+        
+        .header {
+            background: white;
+            padding: 25px 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header h1 { color: #333; font-size: 24px; }
+        
+        .btn {
+            padding: 10px 20px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+        
+        .btn-secondary { background: #6c757d; color: white; }
+        .btn-secondary:hover { background: #545b62; }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        .stat-number { font-size: 32px; font-weight: bold; color: #333; }
+        .stat-label { color: #666; font-size: 13px; margin-top: 5px; }
+        
+        .section {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        
+        .section-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 25px;
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .table thead { background: #f8f9fa; }
+        
+        .table thead th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 13px;
+            color: #333;
+            border-bottom: 2px solid #dee2e6;
+        }
+        
+        .table tbody tr {
+            border-bottom: 1px solid #f0f0f0;
+            transition: all 0.3s;
+        }
+        
+        .table tbody tr:hover { background: #f8f9fa; }
+        
+        .table tbody td {
+            padding: 15px;
+            vertical-align: middle;
+        }
+        
+        .badge {
+            padding: 5px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .badge-success { background: #d4edda; color: #155724; }
+        .badge-warning { background: #fff3cd; color: #856404; }
+        
+        .btn-approve {
+            padding: 6px 12px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        .btn-approve:hover { background: #218838; }
+        
+        .btn-reject {
+            padding: 6px 12px;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        .btn-reject:hover { background: #c82333; }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+        
+        .empty-icon { font-size: 64px; margin-bottom: 15px; }
+        
+        .messages { margin-bottom: 20px; }
+        .message {
+            padding: 14px 18px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+        .message.success { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .message.warning { background: #fff3cd; color: #856404; border-left: 4px solid #ffc107; }
+        .message.error { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+    </style>
+</head>
+<body>
+    {% include 'includes/navbar.html' %}
+    <div class="container">
+        <div class="header">
+            <h1>💊 Eczane Personellerim</h1>
+            <a href="{% url 'export_staff_excel' %}" class="btn btn-secondary">📥 Personel Listesi İndir</a>
+            <a href="{% url 'pharmacy_inbox' %}" class="btn btn-secondary">← Geri</a>
+        </div>
+        
+        {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+            <div class="message {{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number">{{ approved_staff.count }}</div>
+                <div class="stat-label">Onaylı Personel</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" style="color:#ffc107;">{{ pending_staff.count }}</div>
+                <div class="stat-label">Onay Bekleyen</div>
+            </div>
+        </div>
+        
+        <!-- Onay Bekleyen Personel -->
+        {% if pending_staff %}
+        <div class="section">
+            <div class="section-header">⏳ Onay Bekleyen Personel</div>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Ad Soyad</th>
+                        <th>Kullanıcı Adı</th>
+                        <th>Email</th>
+                        <th>Kayıt Tarihi</th>
+                        <th>İşlem</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for staff in pending_staff %}
+                    <tr>
+                        <td><strong>{{ staff.get_full_name }}</strong></td>
+                        <td>{{ staff.username }}</td>
+                        <td>{{ staff.email }}</td>
+                        <td>{{ staff.date_joined|date:"d.m.Y H:i" }}</td>
+                        <td>
+                            <form method="post" action="{% url 'approve_pharmacy_staff' staff.id %}" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn-approve">✅ Onayla</button>
+                            </form>
+                            <form method="post" action="{% url 'reject_pharmacy_staff' staff.id %}" style="display:inline;" onsubmit="return confirm('{{ staff.get_full_name }} kaydını silmek istediğinize emin misiniz?');">
+                                {% csrf_token %}
+                                <button type="submit" class="btn-reject">❌ Reddet</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+        
+        <!-- Onaylı Personel -->
+        <div class="section">
+            <div class="section-header">✅ Onaylı Personel</div>
+            {% if approved_staff %}
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Ad Soyad</th>
+                        <th>Kullanıcı Adı</th>
+                        <th>Email</th>
+                        <th>Durum</th>
+                        <th>Kayıt Tarihi</th>
+                        <th>İşlem</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for staff in approved_staff %}
+                    <tr>
+                        <td><strong>{{ staff.get_full_name }}</strong></td>
+                        <td>{{ staff.username }}</td>
+                        <td>{{ staff.email }}</td>
+                        <td>
+                            {% if staff.is_active_user %}
+                                <span class="badge badge-success">✅ Aktif</span>
+                            {% else %}
+                                <span class="badge badge-warning">⏸️ Pasif</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ staff.date_joined|date:"d.m.Y" }}</td>
+                        <td>
+                            <a href="{% url 'edit_staff_permissions' staff.id %}" class="btn-approve" style="text-decoration:none; display:inline-block;">
+                                ⚙️ Yetkiler
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-icon">👥</div>
+                <h3>Henüz onaylı personel yok</h3>
+                <p>Onay bekleyen personelleri yukarıdan onaylayabilirsiniz.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

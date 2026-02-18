@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kullanıcı Düzenle - {{ edit_user.username }}</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container { max-width: 900px; margin: 0 auto; }
+
+        .header {
+            background: white;
+            padding: 20px 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 { color: #333; font-size: 24px; }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .btn-secondary { background: #6c757d; color: white; }
+        .btn-secondary:hover { background: #545b62; }
+
+        .edit-card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-avatar-large {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: white;
+            color: #667eea;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .card-body { padding: 30px; }
+
+        .form-section {
+            margin-bottom: 30px;
+            padding-bottom: 30px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .form-section:last-child { border-bottom: none; padding-bottom: 0; }
+
+        .form-section h3 {
+            color: #333;
+            font-size: 18px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #667eea;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .form-field label {
+            display: block;
+            color: #555;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .form-field input,
+        .form-field select,
+        .form-field textarea {
+            width: 100%;
+            padding: 12px 14px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+
+        .form-field input:focus,
+        .form-field select:focus,
+        .form-field textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-field textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-field.full-width { grid-column: 1 / -1; }
+
+        .checkbox-field {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 15px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            margin-bottom: 8px;
+        }
+
+        .checkbox-field input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .checkbox-field label {
+            margin: 0;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .save-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 14px 40px;
+            font-size: 16px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .save-btn:hover { opacity: 0.9; }
+
+        .messages { margin-bottom: 20px; }
+        .message { padding: 14px 18px; border-radius: 8px; margin-bottom: 10px; }
+        .message.success { background: #d4edda; color: #155724; }
+        .message.error { background: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+    {% include 'includes/navbar.html' %}
+    <div class="container">
+
+        <div class="header">
+            <h1>✏️ Kullanıcı Düzenle</h1>
+            <a href="{% url 'admin_users' %}" class="btn btn-secondary">← Geri</a>
+        </div>
+
+        {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+            <div class="message {{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="edit-card">
+            <div class="card-header">
+                <div class="user-avatar-large">
+                    {{ edit_user.first_name|first|default:edit_user.username|first }}{{ edit_user.last_name|first }}
+                </div>
+                <div>
+                    <h2>{{ edit_user.get_full_name|default:edit_user.username }}</h2>
+                    <p>@{{ edit_user.username }}</p>
+                </div>
+            </div>
+
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+
+                    <!-- Temel Bilgiler -->
+                    <div class="form-section">
+                        <h3>📋 Temel Bilgiler</h3>
+                        <div class="form-grid">
+                            <div class="form-field">
+                                <label>Adı</label>
+                                <input type="text" name="first_name" value="{{ edit_user.first_name }}" required>
+                            </div>
+                            <div class="form-field">
+                                <label>Soyadı</label>
+                                <input type="text" name="last_name" value="{{ edit_user.last_name }}" required>
+                            </div>
+                            <div class="form-field">
+                                <label>Kullanıcı Adı</label>
+                                <input type="text" value="{{ edit_user.username }}" disabled style="background:#f5f5f5;">
+                            </div>
+                            <div class="form-field">
+                                <label>Email</label>
+                                <input type="email" name="email" value="{{ edit_user.email }}" required>
+                            </div>
+                            <div class="form-field">
+                                <label>Rol</label>
+                                <select name="role" required>
+                                    <option value="firma" {% if edit_user.role == 'firma' %}selected{% endif %}>🏢 Firma</option>
+                                    <option value="eczane" {% if edit_user.role == 'eczane' %}selected{% endif %}>💊 Eczane</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="checkbox-field" style="margin-top:15px;">
+                            <input type="checkbox" name="is_approved" id="is_approved" {% if edit_user.is_approved %}checked{% endif %}>
+                            <label for="is_approved">✅ Kullanıcı Onaylı</label>
+                        </div>
+                    </div>
+
+                    <!-- Firma Bilgileri -->
+                    {% if edit_user.role == 'firma' %}
+                    <div class="form-section">
+                        <h3>🏢 Firma Bilgileri</h3>
+                        <div class="form-grid">
+                            <div class="form-field">
+                                <label>Firma Adı</label>
+                                <input type="text" name="company_name" value="{{ edit_user.company_name|default_if_none:'' }}">
+                            </div>
+                            <div class="form-field">
+                                <label>Vergi No</label>
+                                <input type="text" name="company_tax_number" value="{{ edit_user.company_tax_number|default_if_none:'' }}">
+                            </div>
+                            <div class="form-field">
+                                <label>Telefon</label>
+                                <input type="text" name="company_phone" value="{{ edit_user.company_phone|default_if_none:'' }}">
+                            </div>
+                            <div class="form-field">
+                                <label>Sorumlu Personel</label>
+                                <input type="text" name="company_responsible_person" value="{{ edit_user.company_responsible_person|default_if_none:'' }}">
+                            </div>
+                            <div class="form-field full-width">
+                                <label>Adres</label>
+                                <textarea name="company_address">{{ edit_user.company_address|default_if_none:'' }}</textarea>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Eczane Bilgileri -->
+                    {% if edit_user.role == 'eczane' %}
+                    <div class="form-section">
+                        <h3>💊 Eczane Bilgileri</h3>
+                        <div class="form-grid">
+                            <div class="form-field">
+                                <label>Eczane Adı</label>
+                                <input type="text" name="pharmacy_name" value="{{ edit_user.pharmacy_name|default_if_none:'' }}">
+                            </div>
+                            <div class="form-field">
+                                <label>Eczacı Adı Soyadı</label>
+                                <input type="text" name="pharmacist_name" value="{{ edit_user.pharmacist_name|default_if_none:'' }}">
+                            </div>
+                            <div class="form-field">
+                                <label>Vergi No</label>
+                                <input type="text" name="pharmacy_tax_number" value="{{ edit_user.pharmacy_tax_number|default_if_none:'' }}">
+                            </div>
+                            <div class="form-field">
+                                <label>Ruhsat No</label>
+                                <input type="text" name="pharmacy_license_number" value="{{ edit_user.pharmacy_license_number|default_if_none:'' }}">
+                            </div>
+                            <div class="form-field">
+                                <label>Telefon</label>
+                                <input type="text" name="pharmacy_phone" value="{{ edit_user.pharmacy_phone|default_if_none:'' }}">
+                            </div>
+                            <div class="form-field full-width">
+                                <label>Adres</label>
+                                <textarea name="pharmacy_address">{{ edit_user.pharmacy_address|default_if_none:'' }}</textarea>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- YETKİ YÖNETİMİ -->
+                    <div class="form-section">
+                        <h3>🔐 Yetki Yönetimi</h3>
+                        
+                        <div style="margin-bottom:20px;">
+                            <h4 style="color:#555; font-size:14px; margin-bottom:10px; font-weight:600;">Durum</h4>
+                            <div class="checkbox-field">
+                                <input type="checkbox" name="is_manager" id="is_manager" {% if edit_user.is_manager %}checked{% endif %}>
+                                <label for="is_manager"><strong>👑 Yönetici</strong> - Tüm yetkiler otomatik verilir</label>
+                            </div>
+                            <div class="checkbox-field">
+                                <input type="checkbox" name="is_active_user" id="is_active_user" {% if edit_user.is_active_user %}checked{% endif %}>
+                                <label for="is_active_user"><strong>✅ Aktif Kullanıcı</strong> - Sisteme giriş yapabilir</label>
+                            </div>
+                        </div>
+
+                        {% if edit_user.role == 'firma' %}
+                        <!-- FİRMA YETKİLERİ -->
+                        <div style="margin-bottom:20px;">
+                            <h4 style="color:#555; font-size:14px; margin-bottom:10px; font-weight:600;">📋 Teklif İşlemleri</h4>
+                            <div class="checkbox-field">
+                                <input type="checkbox" name="can_create_offer" {% if edit_user.can_create_offer %}checked{% endif %}>
+                                <label>Teklif Oluşturabilir</label>
+                            </div>
+                            <div class="checkbox-field">
+                                <input type="checkbox" name="can_edit_own_offer" {% if edit_user.can_edit_own_offer %}checked{% endif %}>
+                                <label>Kendi Tekliflerini Düzenleyebilir</label>
+                            </div>
+                            <div class="checkbox-field">
+                                <input type="checkbox" name="can_edit_all_offers" {% if edit_user.can_edit_all_offers %}checked{% endif %}>
+                                <label>Tüm Teklifleri Düzenleyebilir</label>
+                            </div>
+                            <div class="checkbox-field">
+                                <input type="checkbox" name="can_send_offer" {% if edit_user.can_send_offer %}checked{% endif %}>
+                                <label>Teklif Gönderebilir</label>
+                            </div>
+                            <div class="checkbox-field">
+                                <input type="checkbox" name="can_view_all_offers" {% if edit_user.can_view_all_offers %}checked{% endif %}>
+                                <label>Tüm Teklifleri Görebilir</label>
+                            </div>
+                            <div class="checkbox-field">
+                                <input type="checkbox" name="can_approve_high_value_offers" {% if edit_user.can_approve_high_value_offers %}checked{% endif %}>
+                                <label>50K+ Teklifleri Onaylayabilir</label>
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom:20px;">
+                            <h4 style="color:#555; font-size:14px; margin-bottom:10px; font-weight:600;">👥 Personel Yönetimi</h4>
+                            <div class="checkbox-field">
+                                <input type="checkbox" name="can_invite_staff" {% if edit_user.can_invite_staff %}checked{% endif %}>
+                                <label>Personel Davet Edebilir</label>
+                            </div>
+                            <div class="checkbox-field">
+                                <input type="checkbox" name="can_manage_staff_permissions" {% if edit_user.can_manage_staff_permissions %}checked{% endif %}>
+                                <label>Personel Yetkilerini Düzenleyebilir</label>
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom:20px;">
+                            <h4 style="color:#555; font-size:14px; margin-bottom:10px; font-weight:600;">📊 Raporlar</h4>
+                            <div class="checkbox-field">
+                                <input type="checkbox" name="can_view_reports" {% if edit_user.can_view_reports %}checked{% endif %}>
+                                <label>Raporları Görebilir</label>
+                            </div>
+                            <div class="checkbox-field">
+                                <input type="checkbox" name="can_view_financial_data" {% if edit_user.can_view_financial_data %}checked{% endif %}>
+                                <label>Finansal Verileri Görebilir</label>
+                            </div>
+                        </div>
+
+                        {% elif edit_user.role == 'eczane' %}
+                        <!-- ECZANE YETKİLERİ -->
+                        <div style="margin-bottom:20px;">
+                            <h4 style="color:#555; font-size:14px; margin-bottom:10px; font-weight:600;">📋 Teklif İşlemleri</h4>
+                            <div class="checkbox-field">
+                                <input type="checkbox" name="can_approve_pharmacy_offers" {% if edit_user.can_approve_pharmacy_offers %}checked{% endif %}>
+                                <label>Teklif Onaylayabilir</label>
+                            </div>
+                            <div class="checkbox-field">
+                                <input type="checkbox" name="can_reject_pharmacy_offers" {% if edit_user.can_reject_pharmacy_offers %}checked{% endif %}>
+                                <label>Teklif Reddedebilir</label>
+                            </div>
+                            <div class="checkbox-field">
+                                <input type="checkbox" name="can_approve_high_value_pharmacy_offers" {% if edit_user.can_approve_high_value_pharmacy_offers %}checked{% endif %}>
+                                <label>50K+ Teklifleri Onaylayabilir</label>
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom:20px;">
+                            <h4 style="color:#555; font-size:14px; margin-bottom:10px; font-weight:600;">💰 İskonto Yönetimi</h4>
+                            <div class="checkbox-field">
+                                <input type="checkbox" name="can_apply_discount" {% if edit_user.can_apply_discount %}checked{% endif %}>
+                                <label>İskonto Uygulayabilir</label>
+                            </div>
+                            <div class="checkbox-field">
+                                <input type="checkbox" name="can_apply_high_discount" {% if edit_user.can_apply_high_discount %}checked{% endif %}>
+                                <label>%20+ İskonto Uygulayabilir</label>
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom:20px;">
+                            <h4 style="color:#555; font-size:14px; margin-bottom:10px; font-weight:600;">🧾 Fatura İşlemleri</h4>
+                            <div class="checkbox-field">
+                                <input type="checkbox" name="can_enter_invoice" {% if edit_user.can_enter_invoice %}checked{% endif %}>
+                                <label>Fatura Bilgisi Girebilir</label>
+                            </div>
+                            <div class="checkbox-field">
+                                <input type="checkbox" name="can_edit_invoice" {% if edit_user.can_edit_invoice %}checked{% endif %}>
+                                <label>Fatura Düzenleyebilir</label>
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom:20px;">
+                            <h4 style="color:#555; font-size:14px; margin-bottom:10px; font-weight:600;">👥 Personel Yönetimi</h4>
+                            <div class="checkbox-field">
+                                <input type="checkbox" name="can_approve_pharmacy_staff" {% if edit_user.can_approve_pharmacy_staff %}checked{% endif %}>
+                                <label>Personel Onaylayabilir</label>
+                            </div>
+                            <div class="checkbox-field">
+                                <input type="checkbox" name="can_manage_pharmacy_staff" {% if edit_user.can_manage_pharmacy_staff %}checked{% endif %}>
+                                <label>Personel Yönetebilir</label>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <button type="submit" class="save-btn">💾 Değişiklikleri Kaydet</button>
+                </form>
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>

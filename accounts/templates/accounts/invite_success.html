@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Davetiye Oluşturuldu</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+        }
+        
+        .success-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+        
+        h1 {
+            color: #28a745;
+            margin-bottom: 15px;
+            font-size: 28px;
+        }
+        
+        p {
+            color: #666;
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+        
+        .link-box {
+            background: #f8f9fa;
+            border: 2px dashed #667eea;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 25px 0;
+        }
+        
+        .link-box label {
+            display: block;
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        
+        .link-input {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .link-input input {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 13px;
+            font-family: monospace;
+        }
+        
+        .copy-btn {
+            padding: 12px 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .copy-btn:hover {
+            background: #5568d3;
+        }
+        
+        .info-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 6px;
+            font-size: 13px;
+            color: #856404;
+            text-align: left;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 12px 30px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 600;
+            margin: 10px;
+            transition: all 0.3s;
+        }
+        
+        .btn:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+        }
+        
+        .btn-secondary:hover {
+            background: #545b62;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="success-icon">✅</div>
+        <h1>Davetiye Oluşturuldu!</h1>
+        <p>{{ email }} adresine gönderilecek davetiye linki hazır.</p>
+        
+        <div class="link-box">
+            <label>📎 Davetiye Linki:</label>
+            <div class="link-input">
+                <input 
+                    type="text" 
+                    id="inviteLink" 
+                    value="{{ invite_link }}" 
+                    readonly
+                >
+                <button class="copy-btn" onclick="copyLink()">📋 Kopyala</button>
+            </div>
+        </div>
+        
+        <div class="info-box">
+            <strong>⏰ Önemli:</strong> Bu link 7 gün geçerlidir. 
+            Personele bu linki email veya başka bir yolla iletmeniz gerekir.
+        </div>
+        
+        <div>
+            <a href="{% url 'invite_staff' %}" class="btn">+ Başka Personel Davet Et</a>
+            <a href="{% url 'my_staff' %}" class="btn btn-secondary">👥 Personel Listesi</a>
+        </div>
+    </div>
+    
+    <script>
+        function copyLink() {
+            const input = document.getElementById('inviteLink');
+            input.select();
+            document.execCommand('copy');
+            
+            const btn = event.target;
+            btn.textContent = '✅ Kopyalandı!';
+            btn.style.background = '#28a745';
+            
+            setTimeout(() => {
+                btn.textContent = '📋 Kopyala';
+                btn.style.background = '#667eea';
+            }, 2000);
+        }
+    </script>
+</body>
+</html>

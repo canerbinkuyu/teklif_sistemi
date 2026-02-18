@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teklif Detayı - Eczane</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container { max-width: 1200px; margin: 0 auto; }
+
+        /* Header */
+        .header {
+            background: white;
+            padding: 25px 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .header-left h1 { color: #333; font-size: 24px; }
+        .header-left p { color: #666; font-size: 14px; margin-top: 4px; }
+
+        .revision-badge {
+            display: inline-block;
+            background: #007bff;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        .btn:hover { transform: translateY(-1px); }
+        .btn-back { background: #6c757d; color: white; }
+        .btn-back:hover { background: #545b62; }
+
+        /* Messages */
+        .messages { margin-bottom: 20px; }
+        .message { padding: 14px 18px; border-radius: 8px; margin-bottom: 10px; }
+        .message.success { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .message.error { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+
+        /* Info Card */
+        .info-card {
+            background: white;
+            padding: 22px 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 18px;
+        }
+
+        .info-item label {
+            color: #666;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .info-item p {
+            color: #333;
+            font-size: 15px;
+            font-weight: 500;
+            margin-top: 4px;
+        }
+
+        /* Personel Tag */
+        .person-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            margin-top: 6px;
+        }
+        .person-tag.firma { background: #eef1ff; }
+        .person-tag.approve { background: #eafff2; }
+        .person-tag.reject { background: #fff0f0; }
+
+        .person-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 13px;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+        .avatar-firma { background: #667eea; }
+        .avatar-approve { background: #28a745; }
+        .avatar-reject { background: #dc3545; }
+
+        .person-name { font-size: 14px; font-weight: 600; color: #333; }
+        .person-role { font-size: 11px; color: #888; }
+
+        /* Status Badges */
+        .status-badge {
+            display: inline-block;
+            padding: 5px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        .status-sent { background: #fff3cd; color: #856404; }
+        .status-approved { background: #d4edda; color: #155724; }
+        .status-rejected { background: #f8d7da; color: #721c24; }
+
+        /* Action Section */
+        .action-section {
+            background: white;
+            padding: 20px 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-approve { background: #28a745; color: white; padding: 12px 28px; font-size: 15px; }
+        .btn-approve:hover { background: #218838; }
+        .btn-reject { background: #dc3545; color: white; padding: 12px 28px; font-size: 15px; }
+        .btn-reject:hover { background: #c82333; }
+
+        .reject-input {
+            flex: 1;
+            min-width: 200px;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        .reject-input:focus { outline: none; border-color: #dc3545; }
+
+        .closed-notice {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            padding: 12px 18px;
+            border-radius: 8px;
+            color: #856404;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        /* Fatura Bölümü */
+        .invoice-section {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .invoice-header {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            padding: 16px 25px;
+            font-size: 17px;
+            font-weight: 600;
+        }
+
+        .invoice-body { padding: 22px 30px; }
+
+        .invoice-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+        }
+
+        .invoice-field label {
+            display: block;
+            color: #555;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .invoice-field input {
+            width: 100%;
+            padding: 10px 14px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        .invoice-field input:focus { outline: none; border-color: #28a745; }
+        .invoice-field input[type="date"] { cursor: pointer; }
+
+        .invoice-save-btn {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            padding: 12px 35px;
+            font-size: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        .invoice-save-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(40,167,69,0.4);
+        }
+
+        /* Fatura Locked / Revize */
+        .invoice-readonly-item label {
+            color: #666;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .invoice-readonly-item p {
+            color: #333;
+            font-size: 16px;
+            font-weight: 600;
+            margin-top: 5px;
+        }
+
+        .invoice-locked-notice {
+            margin-top: 18px;
+            padding: 10px 16px;
+            background: #f0f0f0;
+            border-radius: 6px;
+            color: #555;
+            font-size: 14px;
+        }
+
+        .invoice-revision-input {
+            flex: 1;
+            min-width: 250px;
+            padding: 10px 14px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        .invoice-revision-input:focus { outline: none; border-color: #667eea; }
+
+        .invoice-revise-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 10px 22px;
+            font-size: 14px;
+            border-radius: 6px;
+        }
+        .invoice-revise-btn:hover { opacity: 0.9; }
+
+        .invoice-pending-notice {
+            margin-top: 14px;
+            padding: 10px 16px;
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            border-radius: 6px;
+            color: #856404;
+            font-size: 14px;
+        }
+
+        .invoice-approved-notice {
+            padding: 10px 16px;
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            border-radius: 6px;
+            color: #155724;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        /* Products Table */
+        .table-section {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .table-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 18px 25px;
+        }
+        .table-header h2 { font-size: 18px; }
+
+        .products-table { width: 100%; border-collapse: collapse; }
+        .products-table thead { background: #f8f9fa; }
+
+        .products-table thead th {
+            padding: 13px 15px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 12px;
+            color: #555;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        .products-table tbody tr { border-bottom: 1px solid #f0f0f0; }
+        .products-table tbody tr:hover { background: #fafafa; }
+        .products-table tbody td { padding: 13px 15px; vertical-align: middle; font-size: 14px; }
+
+        .product-name { font-weight: 600; color: #333; }
+        .price-green { color: #28a745; font-weight: 700; }
+        .price-blue { font-size: 12px; color: #007bff; }
+        .price-red { color: #dc3545; font-weight: 600; font-size: 12px; }
+
+        /* Discount Inputs */
+        .discount-select {
+            padding: 8px 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+            background: white;
+            cursor: pointer;
+            width: 60px;
+        }
+        .discount-select:focus { outline: none; border-color: #667eea; }
+
+        .discount-input {
+            width: 80px;
+            padding: 8px 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+            text-align: right;
+        }
+        .discount-input:focus { outline: none; border-color: #667eea; }
+
+        .note-input {
+            width: 200px;
+            padding: 8px 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 13px;
+            resize: vertical;
+        }
+        .note-input:focus { outline: none; border-color: #667eea; }
+
+        input:disabled, select:disabled, textarea:disabled {
+            background: #f5f5f5;
+            color: #888;
+            cursor: not-allowed;
+        }
+
+        /* Genel İskonto */
+        .overall-discount-box {
+            background: #fff8e1;
+            border: 2px solid #ffe082;
+            border-radius: 10px;
+            padding: 20px 25px;
+            margin-top: 15px;
+            margin-bottom: 5px;
+        }
+
+        .overall-discount-box h4 { color: #f57c00; font-size: 15px; margin-bottom: 12px; }
+
+        .overall-discount-row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .overall-discount-row label { font-size: 14px; color: #555; font-weight: 600; }
+
+        .overall-discount-select {
+            padding: 10px 12px;
+            border: 2px solid #ffe082;
+            border-radius: 6px;
+            font-size: 14px;
+            background: white;
+            cursor: pointer;
+            width: 70px;
+        }
+        .overall-discount-select:focus { outline: none; border-color: #f57c00; }
+
+        .overall-discount-input {
+            width: 100px;
+            padding: 10px 12px;
+            border: 2px solid #ffe082;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: 600;
+            text-align: right;
+        }
+        .overall-discount-input:focus { outline: none; border-color: #f57c00; }
+
+        /* Save Button */
+        .save-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 14px 40px;
+            font-size: 16px;
+            border-radius: 8px;
+            margin-top: 15px;
+            width: 100%;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        .save-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        /* Totals */
+        .totals-section {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .totals-header { background: #2c3e50; color: white; padding: 15px 25px; font-size: 16px; font-weight: 600; }
+        .totals-body { padding: 25px 30px; }
+
+        .totals-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .totals-row:last-child { border-bottom: none; }
+        .totals-row label { color: #555; font-size: 15px; }
+        .totals-row .amount { font-size: 16px; font-weight: 600; color: #333; }
+        .totals-row.discount-row label { color: #dc3545; }
+        .totals-row.discount-row .amount { color: #dc3545; }
+
+        .totals-row.final-row {
+            background: #f0f7ff;
+            margin: 10px -30px -25px -30px;
+            padding: 18px 30px;
+            border-radius: 0 0 10px 10px;
+        }
+        .totals-row.final-row label { font-size: 18px; font-weight: 700; color: #2c3e50; }
+        .totals-row.final-row .amount { font-size: 24px; color: #28a745; }
+
+        @media (max-width: 768px) {
+            .products-table { font-size: 12px; }
+            .products-table thead th, .products-table tbody td { padding: 8px 6px; }
+            .discount-input, .note-input { width: 60px; }
+        }
+    </style>
+</head>
+<body>
+    {% include 'includes/navbar.html' %}
+   <div class="container">
+
+        <!-- Header -->
+        <div class="header">
+            <div class="header-left">
+                <h1>
+                    📋 Teklif #{% if offer.original_offer %}{{ offer.original_offer.id }}{% else %}{{ offer.id }}{% endif %}
+                    {% if offer.revision_number > 1 %}
+                        <span class="revision-badge">🔄 Rev.{{ offer.revision_number }}</span>
+                    {% endif %}
+                </h1>
+                <p>Eczane Teklif Detay Sayfası</p>
+            </div>
+            <a href="{% url 'pharmacy_inbox' %}" class="btn btn-back">← Gelen Tekliflere Dön</a>
+            <a href="{% url 'export_offer_excel' offer.id %}" class="btn" style="background:#28a745; color:white;">📥 Excel</a>
+            <a href="{% url 'export_offer_pdf' offer.id %}" class="btn" style="background:#dc3545; color:white;">📄 PDF</a>
+        </div>
+
+        <!-- Messages -->
+        {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+            <div class="message {{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Info Card: Personel + Durum + Tarihler -->
+        <div class="info-card">
+            <!-- Teklif Hazırlayan (Firma) -->
+            <div class="info-item">
+                <label>Teklif Hazırlayan</label>
+                <div class="person-tag firma">
+                    <div class="person-avatar avatar-firma">{{ offer.user.first_name|first }}{{ offer.user.last_name|first }}</div>
+                    <div>
+                        <div class="person-name">{{ offer.user.get_full_name|default:offer.user.username }}</div>
+                        <div class="person-role">Firma</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Durum -->
+            <div class="info-item">
+                <label>Durum</label>
+                <p>
+                    {% if offer.status == "sent" %}<span class="status-badge status-sent">⏳ Bekliyor</span>
+                    {% elif offer.status == "approved" %}<span class="status-badge status-approved">✅ Onaylandı</span>
+                    {% elif offer.status == "rejected" %}<span class="status-badge status-rejected">❌ Reddedildi</span>
+                    {% endif %}
+                </p>
+            </div>
+
+            <!-- Gönderilme Tarihi -->
+            <div class="info-item">
+                <label>Gönderilme Tarihi</label>
+                <p>{{ offer.sent_at|date:"d.m.Y H:i" }}</p>
+            </div>
+
+            <!-- Onaylayan Personel -->
+            {% if offer.approved_by %}
+            <div class="info-item">
+                <label>Onaylayan Personel</label>
+                <div class="person-tag approve">
+                    <div class="person-avatar avatar-approve">{{ offer.approved_by.first_name|first }}{{ offer.approved_by.last_name|first }}</div>
+                    <div>
+                        <div class="person-name">{{ offer.approved_by.get_full_name|default:offer.approved_by.username }}</div>
+                        <div class="person-role">Eczane</div>
+                    </div>
+                </div>
+            </div>
+            <div class="info-item">
+                <label>Onay Tarihi</label>
+                <p style="color:#28a745; font-weight:600;">{{ offer.approved_at|date:"d.m.Y H:i" }}</p>
+            </div>
+            {% endif %}
+
+            <!-- Reddeden Personel -->
+            {% if offer.rejected_by %}
+            <div class="info-item">
+                <label>Reddeden Personel</label>
+                <div class="person-tag reject">
+                    <div class="person-avatar avatar-reject">{{ offer.rejected_by.first_name|first }}{{ offer.rejected_by.last_name|first }}</div>
+                    <div>
+                        <div class="person-name">{{ offer.rejected_by.get_full_name|default:offer.rejected_by.username }}</div>
+                        <div class="person-role">Eczane</div>
+                    </div>
+                </div>
+            </div>
+            <div class="info-item">
+                <label>Red Tarihi</label>
+                <p style="color:#dc3545; font-weight:600;">{{ offer.rejected_at|date:"d.m.Y H:i" }}</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Red Nedeni -->
+        {% if offer.status == "rejected" and offer.reject_reason %}
+        <div style="background:#fff2f2; border:1px solid #fcc; border-radius:10px; padding:15px 20px; margin-bottom:20px;">
+            <strong style="color:#c33;">❌ Red Nedeni:</strong>
+            <p style="color:#c33; margin-top:5px;">{{ offer.reject_reason }}</p>
+        </div>
+        {% endif %}
+
+        <!-- Onay / Red Butonu -->
+        {% if offer.status == "sent" %}
+        <div class="action-section">
+            <form action="{% url 'pharmacy_approve_offer' offer.id %}" method="post" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-approve"
+                    onclick="return confirm('Bu teklifi ONAYLAMAK istediğinize emin misiniz?')">
+                    ✅ Onayla
+                </button>
+            </form>
+
+            <form action="{% url 'pharmacy_reject_offer' offer.id %}" method="post" style="display:flex; gap:10px; align-items:center; flex:1;">
+                {% csrf_token %}
+                <input type="text" name="reject_reason" class="reject-input" placeholder="Red nedeni (opsiyonel)">
+                <button type="submit" class="btn btn-reject"
+                    onclick="return confirm('Bu teklifi REDDETMEK istediğinize emin misiniz?')">
+                    ❌ Reddet
+                </button>
+            </form>
+        </div>
+        {% else %}
+        <div class="action-section">
+            <div class="closed-notice">🔒 Bu teklif kapalı. İskonto / Not değişikliği yapılamaz.</div>
+        </div>
+        {% endif %}
+
+        <!-- Fatura Bilgileri (sadece onaylandı durumunda gösterilir) -->
+        {% if offer.status == "approved" %}
+        <div class="invoice-section">
+            <div class="invoice-header">📄 Fatura Bilgileri</div>
+            <div class="invoice-body">
+
+                {% if offer.invoice_number and offer.invoice_date and offer.delivery_deadline %}
+                <!-- DOLU → Read-only + Revize Talep -->
+                <div class="invoice-grid">
+                    <div class="invoice-readonly-item">
+                        <label>Fatura No</label>
+                        <p>{{ offer.invoice_number }}</p>
+                    </div>
+                    <div class="invoice-readonly-item">
+                        <label>Fatura Tarihi</label>
+                        <p>{{ offer.invoice_date|date:"d.m.Y" }}</p>
+                    </div>
+                    <div class="invoice-readonly-item">
+                        <label>Termin Tarihi</label>
+                        <p>{{ offer.delivery_deadline|date:"d.m.Y" }}</p>
+                    </div>
+                </div>
+
+                <div class="invoice-locked-notice">
+                    🔒 Fatura bilgileri kaydedilmiş. Değiştirmek için yönetici onayı gereklidir.
+                </div>
+
+                <form method="post" action="{% url 'pharmacy_request_invoice_revision' offer.id %}" style="margin-top: 12px;">
+                    {% csrf_token %}
+                    <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
+                        <input type="text" name="revision_reason" class="invoice-revision-input" placeholder="Değiştirme nedeni (zorunlu)">
+                        <button type="submit" class="btn invoice-revise-btn"
+                            onclick="return confirm('Yöneticiye revize talebi gönderilecek. Devam edeyim mi?')">
+                            📨 Revize Talep Et
+                        </button>
+                    </div>
+                </form>
+
+                {% else %}
+                <!-- BOŞ → Editable form -->
+                <form method="post" action="{% url 'pharmacy_update_invoice' offer.id %}">
+                    {% csrf_token %}
+                    <div class="invoice-grid">
+                        <div class="invoice-field">
+                            <label>Fatura No</label>
+                            <input type="text" name="invoice_number" value="{{ offer.invoice_number|default_if_none:'' }}" placeholder="Fatura numarasını giriniz">
+                        </div>
+                        <div class="invoice-field">
+                            <label>Fatura Tarihi</label>
+                            <input type="date" name="invoice_date" value="{{ offer.invoice_date|date:'Y-m-d' }}">
+                        </div>
+                        <div class="invoice-field">
+                            <label>Termin Tarihi</label>
+                            <input type="date" name="delivery_deadline" value="{{ offer.delivery_deadline|date:'Y-m-d' }}">
+                        </div>
+                    </div>
+                    <button type="submit" class="invoice-save-btn">💾 Fatura Bilgilerini Kaydet</button>
+                </form>
+                {% endif %}
+
+                <!-- Bekleyen revize talebi varsa göster -->
+                {% if offer.invoice_revision_pending %}
+                <div class="invoice-pending-notice">
+                    ⏳ Revize talebi yöneticiye iletildi. Onay bekleniyordu...
+                    <div style="margin-top:6px; font-size:13px;"><strong>Neden:</strong> {{ offer.invoice_revision_reason }}</div>
+                    <div style="margin-top:4px; font-size:12px; color:#856404;">
+                        Talep eden: {{ offer.invoice_revision_requested_by.get_full_name|default:offer.invoice_revision_requested_by.username }}
+                    </div>
+
+                    <!-- Yönetici burada ise onay/red butonları -->
+                    <div style="margin-top:12px; display:flex; gap:10px;">
+                        <form method="post" action="{% url 'pharmacy_approve_invoice_revision' offer.id %}" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn" style="background:#28a745; color:white; padding:8px 18px; font-size:13px;"
+                                onclick="return confirm('Revize talebi onaylanacak. Devam edeyim mi?')">
+                                ✅ Onaylamak
+                            </button>
+                        </form>
+                        <form method="post" action="{% url 'pharmacy_reject_invoice_revision' offer.id %}" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn" style="background:#dc3545; color:white; padding:8px 18px; font-size:13px;"
+                                onclick="return confirm('Revize talebi reddedilecek. Devam edeyim mi?')">
+                                ❌ Reddetmek
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Yönetici onayladı → tekrar editable -->
+                {% if offer.invoice_revision_approved %}
+                <div style="margin-top:15px;">
+                    <div class="invoice-approved-notice">
+                        ✅ Yönetici revizeyi onayladı. Bilgileri şimdi düzenleyebilirsiniz.
+                    </div>
+                    <form method="post" action="{% url 'pharmacy_update_invoice' offer.id %}" style="margin-top:12px;">
+                        {% csrf_token %}
+                        <div class="invoice-grid">
+                            <div class="invoice-field">
+                                <label>Fatura No</label>
+                                <input type="text" name="invoice_number" value="{{ offer.invoice_number|default_if_none:'' }}">
+                            </div>
+                            <div class="invoice-field">
+                                <label>Fatura Tarihi</label>
+                                <input type="date" name="invoice_date" value="{{ offer.invoice_date|date:'Y-m-d' }}">
+                            </div>
+                            <div class="invoice-field">
+                                <label>Termin Tarihi</label>
+                                <input type="date" name="delivery_deadline" value="{{ offer.delivery_deadline|date:'Y-m-d' }}">
+                            </div>
+                        </div>
+                        <button type="submit" class="invoice-save-btn">💾 Fatura Bilgilerini Kaydet</button>
+                    </form>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Ürünler Tablo -->
+        <form method="post" action="{% url 'pharmacy_update_discounts' offer.id %}">
+            {% csrf_token %}
+
+            <div class="table-section">
+                <div class="table-header">
+                    <h2>📦 Ürün Listesi</h2>
+                </div>
+
+                <table class="products-table">
+                    <thead>
+                        <tr>
+                            <th>Ürün Adı</th>
+                            <th>Adet</th>
+                            <th>Birim Fiyat<br><small style="color:#999;">(KDV Dahil / Hariç)</small></th>
+                            <th>KDV %</th>
+                            <th>Ara Toplam<br><small style="color:#999;">(KDV Hariç)</small></th>
+                            <th>İskonto</th>
+                            <th>İskontolu<br><small style="color:#999;">(KDV Hariç)</small></th>
+                            <th>KDV</th>
+                            <th>Toplam<br><small style="color:#999;">(KDV Dahil)</small></th>
+                            <th>Not</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in offer.items.all %}
+                        <tr>
+                            <td>
+                                <div class="product-name">{{ item.product.name }}</div>
+                                {% if item.delivery_address %}
+                                <div style="color:#666; font-size:12px; margin-top:5px; font-style:italic;">
+                                    📍 Teslimat: {{ item.delivery_address.title }} - {{ item.delivery_address.city }}
+                                </div>
+                            {% endif %}
+                            </td>
+
+                            <td>{{ item.quantity }}</td>
+
+                            <!-- Birim Fiyat: KDV Dahil (yeşil) + KDV Hariç (mavi) -->
+                            <td>
+                                <span class="price-green">{{ item.unit_price_with_vat|floatformat:2 }} ₺</span><br>
+                                <span class="price-blue">{{ item.unit_price|floatformat:2 }} ₺</span>
+                            </td>
+
+                            <td>%{{ item.vat_rate }}</td>
+                            <td>{{ item.gross_line_subtotal|floatformat:2 }} ₺</td>
+
+                            <!-- İskonto -->
+                            <td>
+                                <div style="display:flex; gap:6px; align-items:center;">
+                                    <select name="discount_type_{{ item.id }}" class="discount-select"
+                                        {% if offer.status != "sent" %}disabled{% endif %}>
+                                        <option value="none" {% if item.discount_type == "none" %}selected{% endif %}>Yok</option>
+                                        <option value="percent" {% if item.discount_type == "percent" %}selected{% endif %}>%</option>
+                                        <option value="amount" {% if item.discount_type == "amount" %}selected{% endif %}>₺</option>
+                                    </select>
+                                    <input type="text" name="discount_value_{{ item.id }}"
+                                        value="{{ item.discount_value|floatformat:2 }}"
+                                        class="discount-input"
+                                        {% if offer.status != "sent" %}disabled{% endif %}>
+                                </div>
+                                {% if item.discount_type != "none" %}
+                                <div class="price-red" style="margin-top:4px;">-{{ item.discount_amount|floatformat:2 }} ₺</div>
+                                {% endif %}
+                            </td>
+
+                            <td>{{ item.line_subtotal|floatformat:2 }} ₺</td>
+                            <td>{{ item.vat_amount|floatformat:2 }} ₺</td>
+                            <td><strong class="price-green">{{ item.total_price|floatformat:2 }} ₺</strong></td>
+
+                            <!-- Not -->
+                            <td>
+                                <textarea name="note_{{ item.id }}" class="note-input" rows="2"
+                                    {% if offer.status != "sent" %}disabled{% endif %}>{{ item.note|default_if_none:'' }}</textarea>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Genel Toplam İskonto -->
+            {% if offer.status == "sent" %}
+            <div class="overall-discount-box">
+                <h4>🏷️ Genel Toplam İskonto</h4>
+                <div class="overall-discount-row">
+                    <label>İskonto Tipi:</label>
+                    <select name="overall_discount_type" class="overall-discount-select">
+                        <option value="none" {% if offer.overall_discount_type == "none" %}selected{% endif %}>Yok</option>
+                        <option value="percent" {% if offer.overall_discount_type == "percent" %}selected{% endif %}>%</option>
+                        <option value="amount" {% if offer.overall_discount_type == "amount" %}selected{% endif %}>₺</option>
+                    </select>
+                    <label>Değer:</label>
+                    <input type="text" name="overall_discount_value"
+                        value="{{ offer.overall_discount_value|floatformat:2 }}"
+                        class="overall-discount-input">
+                </div>
+            </div>
+
+            <button type="submit" class="btn save-btn">💾 İskonto + Notları Kaydet</button>
+            {% endif %}
+        </form>
+
+        <!-- Toplam Özeti -->
+        <div class="totals-section">
+            <div class="totals-header">📊 Toplam Özeti</div>
+            <div class="totals-body">
+
+                <div class="totals-row">
+                    <label>KDV Hariç Toplam (İskonto Öncesi)</label>
+                    <span class="amount">{{ offer.items_subtotal_net|floatformat:2 }} ₺</span>
+                </div>
+
+                {% if offer.items_subtotal_net != offer.items_net_after_item_discounts %}
+                <div class="totals-row discount-row">
+                    <label>Ürün İskonto Toplamı</label>
+                    <span class="amount">-{{ offer.total_item_discounts|floatformat:2 }} ₺</span>
+                </div>
+                <div class="totals-row">
+                    <label>KDV Hariç Toplam (Ürün İskontları Sonrası)</label>
+                    <span class="amount">{{ offer.items_net_after_item_discounts|floatformat:2 }} ₺</span>
+                </div>
+                {% endif %}
+
+                {% if offer.overall_discount_type != "none" %}
+                <div class="totals-row discount-row">
+                    <label>
+                        🏷️ Genel İskonto
+                        {% if offer.overall_discount_type == "percent" %}({{ offer.overall_discount_value }}%){% endif %}
+                        {% if offer.overall_discount_type == "amount" %}(₺){% endif %}
+                    </label>
+                    <span class="amount">-{{ offer.overall_discount_amount|floatformat:2 }} ₺</span>
+                </div>
+                <div class="totals-row">
+                    <label>Genel İskonto Sonrası KDV Hariç</label>
+                    <span class="amount">{{ offer.net_after_overall_discount|floatformat:2 }} ₺</span>
+                </div>
+                {% endif %}
+
+                <div class="totals-row">
+                    <label>KDV Toplamı</label>
+                    <span class="amount">
+                        {% if offer.overall_discount_type != "none" %}
+                            {{ offer.vat_after_overall_discount|floatformat:2 }} ₺
+                        {% else %}
+                            {{ offer.items_vat_after_item_discounts|floatformat:2 }} ₺
+                        {% endif %}
+                    </span>
+                </div>
+
+                <div class="totals-row final-row">
+                    <label>💰 Son Toplam (KDV Dahil)</label>
+                    <span class="amount">{{ offer.final_total|floatformat:2 }} ₺</span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>

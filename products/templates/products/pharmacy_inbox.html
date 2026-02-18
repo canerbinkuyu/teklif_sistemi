@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gelen Teklifler - Eczane</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            padding: 25px 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 26px;
+        }
+
+        .header p {
+            color: #666;
+            margin-top: 5px;
+            font-size: 14px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #545b62;
+        }
+
+        /* Stats Bar */
+        .stats-bar {
+            background: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .stat-number {
+            font-size: 28px;
+            font-weight: bold;
+            color: #ffc107;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 14px;
+        }
+
+        /* Table Container */
+        .table-container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .table-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 25px;
+        }
+
+        .table-header h2 {
+            font-size: 20px;
+        }
+
+        /* Offers Table */
+        .offers-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .offers-table thead {
+            background: #f8f9fa;
+        }
+
+        .offers-table thead th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 13px;
+            color: #333;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        .offers-table tbody tr {
+            border-bottom: 1px solid #f0f0f0;
+            transition: all 0.3s;
+        }
+
+        .offers-table tbody tr:hover {
+            background: #f8f9fa;
+            transform: scale(1.01);
+        }
+
+        .offers-table tbody td {
+            padding: 18px 15px;
+            vertical-align: middle;
+        }
+
+        .offer-id {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .revision-badge {
+            display: inline-block;
+            background: #007bff;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+
+        .company-name {
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .company-username {
+            color: #666;
+            font-size: 12px;
+            display: block;
+            margin-top: 3px;
+        }
+
+        .date-time {
+            color: #666;
+            font-size: 13px;
+        }
+
+        .item-count {
+            text-align: center;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .price {
+            font-size: 18px;
+            font-weight: bold;
+            color: #28a745;
+            text-align: right;
+        }
+
+        .revision-note {
+            color: #666;
+            font-size: 12px;
+            font-style: italic;
+            max-width: 200px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .action-btn {
+            padding: 8px 20px;
+            background: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: inline-block;
+        }
+
+        .action-btn:hover {
+            background: #0056b3;
+            transform: scale(1.05);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 80px 40px;
+        }
+
+        .empty-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+        }
+
+        .empty-state h3 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 22px;
+        }
+
+        .empty-state p {
+            color: #666;
+            font-size: 15px;
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .offers-table {
+                font-size: 12px;
+            }
+
+            .offers-table thead th,
+            .offers-table tbody td {
+                padding: 12px 10px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .offers-table thead th,
+            .offers-table tbody td {
+                padding: 10px 8px;
+                font-size: 11px;
+            }
+
+            .offer-id {
+                font-size: 14px;
+            }
+
+            .price {
+                font-size: 14px;
+            }
+        }
+
+        /* Status Badges */
+        .status-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .status-sent {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-approved {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-rejected {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+    </style>
+</head>
+<body>
+    {% include 'includes/navbar.html' %}
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div>
+                <h1>📬 Gelen Teklifler</h1>
+                <p>Firmaların size gönderdiği teklif talepleri</p>
+            </div>
+            <a href="{% url 'pharmacy_dashboard' %}" class="btn btn-secondary">← Ana Sayfa</a>
+        </div>
+
+        <!-- Stats Bar -->
+        <div class="stats-bar">
+            <div>
+                <div class="stat-number">{{ offers.count }}</div>
+                <div class="stat-label">Bekleyen Teklif</div>
+            </div>
+            <div style="color: #666; font-size: 14px;">
+                En son güncelleme: {{ offers.first.sent_at|date:"d.m.Y H:i"|default:"Henüz teklif yok" }}
+            </div>
+        </div>
+
+        <!-- Table -->
+        <div class="table-container">
+            <div class="table-header">
+                <h2>📋 Teklif Listesi</h2>
+            </div>
+
+            {% if offers %}
+            <table class="offers-table">
+                <thead>
+                    <tr>
+                        <th>Teklif No</th>
+                        <th>Firma</th>
+                        <th>Gönderim Tarihi</th>
+                        <th style="text-align: center;">Durum</th>
+                        <th style="text-align: center;">Ürün Sayısı</th>
+                        <th style="text-align: right;">Toplam Tutar</th>
+                        <th>Not</th>
+                        <th style="text-align: center;">İşlem</th>
+                    </tr>
+                </thead>
+            <tbody>
+                {% for o in offers %}
+                <tr>
+                    <td>
+                        <span class="offer-id">
+                            #{% if o.original_offer %}{{ o.original_offer.id }}{% else %}{{ o.id }}{% endif %}
+                        </span>
+                        {% if o.revision_number > 1 %}
+                        <span class="revision-badge">🔄 Rev.{{ o.revision_number }}</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="company-name">{{ o.user.get_full_name|default:o.user.username }}</div>
+                        <span class="company-username">@{{ o.user.username }}</span>
+                    </td>
+                    <td>
+                        <div class="date-time">📅 {{ o.sent_at|date:"d.m.Y" }}</div>
+                        <div class="date-time">🕒 {{ o.sent_at|date:"H:i" }}</div>
+                    </td>
+                    <!-- YENİ DURUM KOLONU -->
+                    <td style="text-align: center;">
+                        {% if o.status == 'sent' %}
+                            <span class="status-badge status-sent">⏳ Bekliyor</span>
+                        {% elif o.status == 'approved' %}
+                            <span class="status-badge status-approved">✅ Onaylandı</span>
+                        {% elif o.status == 'rejected' %}
+                            <span class="status-badge status-rejected">❌ Reddedildi</span>
+                        {% endif %}
+                    </td>
+                    <!-- DEVAMI AYNI -->
+                    <td class="item-count">
+                        📦 {{ o.items.count }} adet
+                    </td>
+                    <td>
+                        <div class="price">{{ o.gross_total_price|floatformat:2 }} ₺</div>
+                    </td>
+                    <td>
+                        {% if o.revision_note %}
+                        <div class="revision-note" title="{{ o.revision_note }}">
+                            📝 {{ o.revision_note }}
+                        </div>
+                        {% else %}
+                        <span style="color: #ccc;">-</span>
+                        {% endif %}
+                    </td>
+                    <td style="text-align: center;">
+                        <a href="{% url 'pharmacy_offer_detail' o.id %}" class="action-btn">
+                            👁️ İncele
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            </table>
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-icon">📭</div>
+                <h3>Henüz Gelen Teklif Yok</h3>
+                <p>Firmalar size teklif gönderdiğinde burada görüntülenecektir.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kullanıcı Yönetimi - Admin</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container { max-width: 1600px; margin: 0 auto; }
+
+        /* Header */
+        .header {
+            background: white;
+            padding: 20px 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .header h1 { color: #333; font-size: 24px; display: flex; align-items: center; gap: 10px; }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .btn-secondary { background: #6c757d; color: white; }
+        .btn-secondary:hover { background: #545b62; }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .stat-info h3 { font-size: 28px; color: #333; margin-bottom: 5px; }
+        .stat-info p { font-size: 13px; color: #666; }
+
+        .icon-blue { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .icon-green { background: linear-gradient(135deg, #56ab2f 0%, #a8e063 100%); }
+        .icon-orange { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+        .icon-yellow { background: linear-gradient(135deg, #ffd89b 0%, #19547b 100%); }
+
+        /* Filters */
+        .filters-section {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            align-items: end;
+        }
+
+        .filter-group label {
+            display: block;
+            color: #555;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .filter-group select,
+        .filter-group input {
+            width: 100%;
+            padding: 10px 14px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .filter-group select:focus,
+        .filter-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn-filter {
+            background: #667eea;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .btn-filter:hover { background: #5568d3; }
+
+        /* Users Table */
+        .users-section {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .section-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .section-header h2 { font-size: 20px; }
+
+        .users-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .users-table thead {
+            background: #f8f9fa;
+        }
+
+        .users-table thead th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 13px;
+            color: #333;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        .users-table tbody tr {
+            border-bottom: 1px solid #f0f0f0;
+            transition: all 0.3s;
+        }
+
+        .users-table tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        .users-table tbody td {
+            padding: 15px;
+            vertical-align: middle;
+        }
+
+        /* User Avatar */
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-details h4 {
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 3px;
+        }
+
+        .user-details p {
+            font-size: 12px;
+            color: #666;
+        }
+
+        /* Badges */
+        .badge {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .badge-firma { background: #e3f2fd; color: #1976d2; }
+        .badge-eczane { background: #e8f5e9; color: #388e3c; }
+        .badge-approved { background: #d4edda; color: #155724; }
+        .badge-pending { background: #fff3cd; color: #856404; }
+
+        /* Action Buttons */
+        .actions-cell {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .btn-action {
+            padding: 6px 12px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-edit { background: #007bff; color: white; }
+        .btn-edit:hover { background: #0056b3; }
+
+        .btn-approve { background: #28a745; color: white; }
+        .btn-approve:hover { background: #218838; }
+
+        .btn-reject { background: #ffc107; color: #333; }
+        .btn-reject:hover { background: #e0a800; }
+
+        .btn-delete { background: #dc3545; color: white; }
+        .btn-delete:hover { background: #c82333; }
+
+        /* Messages */
+        .messages { margin-bottom: 20px; }
+        .message {
+            padding: 14px 18px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+        .message.success { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .message.warning { background: #fff3cd; color: #856404; border-left: 4px solid #ffc107; }
+        .message.error { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .empty-icon { font-size: 64px; margin-bottom: 20px; }
+        .empty-state h3 { color: #333; margin-bottom: 10px; }
+        .empty-state p { color: #666; }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .users-table { font-size: 12px; }
+            .users-table thead th,
+            .users-table tbody td { padding: 10px; }
+            .actions-cell { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+    {% include 'includes/navbar.html' %}
+    <div class="container">
+
+        <!-- Header -->
+        <div class="header">
+            <h1>👥 Kullanıcı Yönetimi</h1>
+            <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary">← Dashboard</a>
+        </div>
+
+        <!-- Messages -->
+        {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+            <div class="message {{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon icon-blue">👥</div>
+                <div class="stat-info">
+                    <h3>{{ users.count }}</h3>
+                    <p>Toplam Kullanıcı</p>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon icon-green">🏢</div>
+                <div class="stat-info">
+                    <h3>{{ users|length|add:0 }}</h3>
+                    <p>Firma Kullanıcıları</p>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon icon-orange">💊</div>
+                <div class="stat-info">
+                    <h3>{{ users|length|add:0 }}</h3>
+                    <p>Eczane Kullanıcıları</p>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon icon-yellow">⏳</div>
+                <div class="stat-info">
+                    <h3>{{ users|length|add:0 }}</h3>
+                    <p>Onay Bekleyenler</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="filters-section">
+            <form method="get" class="filters-grid">
+                <div class="filter-group">
+                    <label>Rol</label>
+                    <select name="role">
+                        <option value="all" {% if role_filter == 'all' %}selected{% endif %}>Tümü</option>
+                        <option value="firma" {% if role_filter == 'firma' %}selected{% endif %}>Firma</option>
+                        <option value="eczane" {% if role_filter == 'eczane' %}selected{% endif %}>Eczane</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label>Durum</label>
+                    <select name="status">
+                        <option value="all" {% if status_filter == 'all' %}selected{% endif %}>Tümü</option>
+                        <option value="approved" {% if status_filter == 'approved' %}selected{% endif %}>Onaylı</option>
+                        <option value="pending" {% if status_filter == 'pending' %}selected{% endif %}>Bekleyen</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label>Ara</label>
+                    <input type="text" name="search" value="{{ search_query }}" placeholder="Kullanıcı adı, email...">
+                </div>
+
+                <div class="filter-group">
+                    <button type="submit" class="btn-filter">🔍 Filtrele</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Users Table -->
+        <div class="users-section">
+            <div class="section-header">
+                <h2>Kullanıcılar ({{ users.count }})</h2>
+            </div>
+
+            {% if users %}
+            <table class="users-table">
+                <thead>
+                    <tr>
+                        <th>Kullanıcı</th>
+                        <th>Email</th>
+                        <th>Rol</th>
+                        <th>Durum</th>
+                        <th>Kayıt Tarihi</th>
+                        <th>İşlemler</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr>
+                        <td>
+                            <div class="user-info">
+                                <div class="user-avatar">
+                                    {{ user.first_name|first|default:user.username|first }}{{ user.last_name|first }}
+                                </div>
+                                <div class="user-details">
+                                    <h4>{{ user.get_full_name|default:user.username }}</h4>
+                                    <p>@{{ user.username }}</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td>{{ user.email }}</td>
+                        <td>
+                            {% if user.role == 'firma' %}
+                                <span class="badge badge-firma">🏢 Firma</span>
+                            {% elif user.role == 'eczane' %}
+                                <span class="badge badge-eczane">💊 Eczane</span>
+                            {% else %}
+                                <span class="badge">-</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if user.is_approved %}
+                                <span class="badge badge-approved">✅ Onaylı</span>
+                            {% else %}
+                                <span class="badge badge-pending">⏳ Bekliyor</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ user.date_joined|date:"d.m.Y H:i" }}</td>
+                        <td>
+                            <div class="actions-cell">
+                                <a href="{% url 'admin_user_edit' user.id %}" class="btn-action btn-edit">✏️ Düzenle</a>
+                                
+                                {% if not user.is_approved %}
+                                <form method="post" action="{% url 'admin_user_approve' user.id %}" style="display:inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn-action btn-approve">✅ Onayla</button>
+                                </form>
+                                {% else %}
+                                <form method="post" action="{% url 'admin_user_reject' user.id %}" style="display:inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn-action btn-reject">⏸️ İptal</button>
+                                </form>
+                                {% endif %}
+                                
+                                {% if not user.is_superuser %}
+                                <form method="post" action="{% url 'admin_user_delete' user.id %}" style="display:inline;" onsubmit="return confirm('{{ user.username }} kullanıcısını silmek istediğinize emin misiniz?');">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn-action btn-delete">🗑️ Sil</button>
+                                </form>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-icon">👥</div>
+                <h3>Kullanıcı Bulunamadı</h3>
+                <p>Arama kriterlerinize uygun kullanıcı bulunamadı.</p>
+            </div>
+            {% endif %}
+        </div>
+
+    </div>
+</body>
+</html>

@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profil - {{ user.get_full_name|default:user.username }}</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container { max-width: 900px; margin: 0 auto; }
+
+        /* Header */
+        <a href="{% url 'address_list' %}" class="btn">📍 Adreslerim</a>
+
+        .header {
+            background: white;
+            padding: 25px 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .header h1 { color: #333; font-size: 24px; }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .btn-primary { background: #007bff; color: white; }
+        .btn-primary:hover { background: #0056b3; }
+
+        /* Messages */
+        .messages { margin-bottom: 20px; }
+        .message { padding: 14px 18px; border-radius: 8px; margin-bottom: 10px; }
+        .message.success { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .message.error { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+
+        /* Profile Card */
+        .profile-card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .profile-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 30px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            font-weight: 700;
+            color: #667eea;
+            flex-shrink: 0;
+        }
+
+        .profile-info h2 { font-size: 22px; margin-bottom: 5px; }
+        .profile-info .role-badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.2);
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 13px;
+        }
+
+        /* Form */
+        .profile-body { padding: 30px; }
+
+        .form-section {
+            margin-bottom: 30px;
+            padding-bottom: 30px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .form-section:last-child { border-bottom: none; margin-bottom: 0; }
+
+        .form-section h3 {
+            color: #333;
+            font-size: 18px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #667eea;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .form-field label {
+            display: block;
+            color: #555;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .form-field input,
+        .form-field textarea {
+            width: 100%;
+            padding: 12px 14px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+
+        .form-field input:focus,
+        .form-field textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-field textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-field.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .save-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 14px 40px;
+            font-size: 16px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .save-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        @media (max-width: 768px) {
+            .form-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    {% include 'includes/navbar.html' %}
+    <div class="container">
+
+        <!-- Header -->
+        <div class="header">
+            <h1>👤 Profil Ayarları</h1>
+            <a href="{% url 'redirect_after_login' %}" class="btn btn-primary">← Ana Sayfa</a>
+        </div>
+
+        <!-- Messages -->
+        {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+            <div class="message {{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Profile Card -->
+        <div class="profile-card">
+            <!-- Profile Header -->
+            <div class="profile-header">
+                <div class="profile-avatar">
+                    {{ user.first_name|first }}{{ user.last_name|first }}
+                </div>
+                <div class="profile-info">
+                    <h2>{{ user.get_full_name|default:user.username }}</h2>
+                    <span class="role-badge">
+                        {% if user.role == "firma" %}🏢 Firma
+                        {% elif user.role == "eczane" %}💊 Eczane
+                        {% else %}👤 Kullanıcı
+                        {% endif %}
+                    </span>
+                </div>
+            </div>
+
+            <!-- Profile Body -->
+            <div class="profile-body">
+                <form method="post">
+                    {% csrf_token %}
+
+                    <!-- Kişisel Bilgiler -->
+                    <div class="form-section">
+                        <h3>📋 Kişisel Bilgiler</h3>
+                        <div class="form-grid">
+                            <div class="form-field">
+                                <label>Adınız</label>
+                                <input type="text" name="first_name" value="{{ user.first_name }}" required>
+                            </div>
+                            <div class="form-field">
+                                <label>Soyadınız</label>
+                                <input type="text" name="last_name" value="{{ user.last_name }}" required>
+                            </div>
+                            <div class="form-field">
+                                <label>Kullanıcı Adı</label>
+                                <input type="text" value="{{ user.username }}" disabled style="background:#f5f5f5; color:#888;">
+                            </div>
+                            <div class="form-field">
+                                <label>E-posta</label>
+                                <input type="email" name="email" value="{{ user.email }}" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- FİRMA Bilgileri -->
+                    {% if user.role == "firma" %}
+                    <div class="form-section">
+                        <h3>🏢 Firma Bilgileri</h3>
+                        <div class="form-grid">
+                            <div class="form-field">
+                                <label>Firma Adı</label>
+                                <input type="text" name="company_name" value="{{ user.manager.company_name|default_if_none:'' }}" {% if not user.is_manager %}readonly{% endif %}>
+                            </div>
+                            <div class="form-field">
+                                <label>Vergi No</label>
+                                <input type="text" name="company_tax_number" value="{{ user.manager.company_tax_number|default_if_none:'' }}" {% if not user.is_manager %}readonly{% endif %}>
+                            </div>
+                            <div class="form-field">
+                                <label>Telefon</label>
+                                <input type="text" name="company_phone" value="{{ user.manager.company_phone|default_if_none:'' }}" placeholder="05XX XXX XX XX" {% if not user.is_manager %}readonly{% endif %}>
+                            </div>
+                            <div class="form-field">
+                                <label>Sorumlu Personel</label>
+                                <input type="text" name="company_responsible_person" value="{{ user.manager.company_responsible_person|default_if_none:'' }}" {% if not user.is_manager %}readonly{% endif %}>
+                            </div>
+                            <div class="form-field full-width">
+                                <label>Firma Adresi</label>
+                                <textarea name="company_address" {% if not user.is_manager %}readonly{% endif %}>{{ user.manager.company_address|default_if_none:'' }}</textarea>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- ECZANE Bilgileri -->
+                    {% if user.role == "eczane" %}
+                    <div class="form-section">
+                        <h3>💊 Eczane Bilgileri</h3>
+                        <div class="form-grid">
+                            <div class="form-field">
+                                <label>Eczane Adı</label>
+                                <input type="text" name="pharmacy_name" value="{{ user.pharmacy_name|default_if_none:'' }}" {% if not user.is_manager %}readonly{% endif %}>
+                            </div>
+                            <div class="form-field">
+                                <label>Eczacı Adı Soyadı</label>
+                                <input type="text" name="pharmacist_name" value="{{ user.pharmacist_name|default_if_none:'' }}" {% if not user.is_manager %}readonly{% endif %}>
+                            </div>
+                            <div class="form-field">
+                                <label>Vergi No</label>
+                                <input type="text" name="pharmacy_tax_number" value="{{ user.pharmacy_tax_number|default_if_none:'' }}" {% if not user.is_manager %}readonly{% endif %}>
+                            </div>
+                            <div class="form-field">
+                                <label>Ruhsat No</label>
+                                <input type="text" name="pharmacy_license_number" value="{{ user.pharmacy_license_number|default_if_none:'' }}" {% if not user.is_manager %}readonly{% endif %}>
+                            </div>
+                            <div class="form-field">
+                                <label>Telefon</label>
+                                <input type="text" name="pharmacy_phone" value="{{ user.pharmacy_phone|default_if_none:'' }}" placeholder="05XX XXX XX XX" {% if not user.is_manager %}readonly{% endif %}>
+                            </div>
+                            <div class="form-field">
+                                <label>Cep Telefonu</label>
+                                <input type="tel" name="pharmacy_mobile" value="{{ user.pharmacy_mobile|default_if_none:'' }}" placeholder="05XX XXX XX XX" {% if not user.is_manager %}readonly{% endif %}>
+                            </div>
+                            <div class="form-field">
+                                <label>Eczane Email</label>
+                                <input type="email" name="pharmacy_email" value="{{ user.pharmacy_email|default_if_none:'' }}" {% if not user.is_manager %}readonly{% endif %}>
+                                <small style="color:#666; font-size:12px; margin-top:4px; display:block;">Personel kayıt için kullanılacak email</small>
+                            </div>
+                            <div class="form-field full-width">
+                                <label>Eczane Adresi</label>
+                                <textarea name="pharmacy_address" {% if not user.is_manager %}readonly{% endif %}>{{ user.pharmacy_address|default_if_none:'' }}</textarea>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <button type="submit" class="save-btn">💾 Değişiklikleri Kaydet</button>
+                </form>
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>

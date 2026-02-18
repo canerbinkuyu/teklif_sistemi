@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personellerim</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container { max-width: 1200px; margin: 0 auto; }
+        
+        .header {
+            background: white;
+            padding: 25px 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header h1 { color: #333; font-size: 24px; }
+        
+        .btn {
+            padding: 10px 20px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+        
+        .btn-primary { background: #28a745; color: white; }
+        .btn-primary:hover { background: #218838; }
+        
+        .btn-secondary { background: #6c757d; color: white; }
+        .btn-secondary:hover { background: #545b62; }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        .stat-number { font-size: 32px; font-weight: bold; color: #333; }
+        .stat-label { color: #666; font-size: 13px; margin-top: 5px; }
+        
+        .section {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        
+        .section-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 25px;
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .table thead { background: #f8f9fa; }
+        
+        .table thead th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 13px;
+            color: #333;
+            border-bottom: 2px solid #dee2e6;
+        }
+        
+        .table tbody tr {
+            border-bottom: 1px solid #f0f0f0;
+            transition: all 0.3s;
+        }
+        
+        .table tbody tr:hover { background: #f8f9fa; }
+        
+        .table tbody td {
+            padding: 15px;
+            vertical-align: middle;
+        }
+        
+        .badge {
+            padding: 5px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .badge-success { background: #d4edda; color: #155724; }
+        .badge-warning { background: #fff3cd; color: #856404; }
+        .badge-danger { background: #f8d7da; color: #721c24; }
+        
+        .copy-btn {
+            padding: 6px 12px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        
+        .copy-btn:hover { background: #0056b3; }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+        
+        .empty-icon { font-size: 64px; margin-bottom: 15px; }
+    </style>
+</head>
+<body>
+    {% include 'includes/navbar.html' %}
+    navbar.html → teklif_sistemi/templates/includes/navbar.html
+    <div class="container">
+        <div class="header">
+            <h1>👥 Personellerim</h1>
+            <div style="display:flex; gap:10px;">
+                <a href="{% url 'invite_staff' %}" class="btn btn-primary">+ Personel Davet Et</a>
+                <a href="{% url 'export_staff_excel' %}" class="btn btn-secondary">📥 Personel Listesi İndir</a>
+                <a href="{% url 'my_offers' %}" class="btn btn-secondary">← Geri</a>
+            </div>
+        </div>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number">{{ active_staff.count }}</div>
+                <div class="stat-label">Aktif Personel</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" style="color:#ffc107;">{{ pending_invites.count }}</div>
+                <div class="stat-label">Bekleyen Davetiye</div>
+            </div>
+        </div>
+        
+        <!-- Bekleyen Davetiyeler -->
+        {% if pending_invites %}
+        <div class="section">
+            <div class="section-header">⏳ Bekleyen Davetiyeler</div>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Email</th>
+                        <th>Ad Soyad</th>
+                        <th>Davetiye Tarihi</th>
+                        <th>Geçerlilik</th>
+                        <th>İşlem</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for invite in pending_invites %}
+                    <tr>
+                        <td>{{ invite.email }}</td>
+                        <td>{{ invite.first_name }} {{ invite.last_name }}</td>
+                        <td>{{ invite.date_joined|date:"d.m.Y H:i" }}</td>
+                        <td>
+                            {% if invite.invitation_expires %}
+                                <span class="badge badge-warning">
+                                    {{ invite.invitation_expires|date:"d.m.Y" }} tarihine kadar
+                                </span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <button class="copy-btn" onclick="copyLink('{{ request.scheme }}://{{ request.get_host }}/accounts/register/staff/{{ invite.invitation_token }}/')">
+                                📋 Link Kopyala
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+        
+        <!-- Aktif Personel -->
+        <div class="section">
+            <div class="section-header">✅ Aktif Personel</div>
+            {% if active_staff %}
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Kullanıcı Adı</th>
+                        <th>Ad Soyad</th>
+                        <th>Email</th>
+                        <th>Durum</th>
+                        <th>Kayıt Tarihi</th>
+                        <th>İşlem</th>  <!-- YENİ SÜTUN -->
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for staff in active_staff %}
+                    <tr>
+                        <td><strong>{{ staff.username }}</strong></td>
+                        <td>{{ staff.get_full_name }}</td>
+                        <td>{{ staff.email }}</td>
+                        <td>
+                            {% if staff.is_active_user %}
+                                <span class="badge badge-success">✅ Aktif</span>
+                            {% else %}
+                                <span class="badge badge-danger">❌ Pasif</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ staff.date_joined|date:"d.m.Y" }}</td>
+                         <td>
+                            <a href="{% url 'edit_staff_permissions' staff.id %}" class="copy-btn" style="background:#28a745;">
+                                ⚙️ Yetkiler
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-icon">👥</div>
+                <h3>Henüz personel yok</h3>
+                <p>Personel davet etmek için yukarıdaki butonu kullanın.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <script>
+        function copyLink(link) {
+            navigator.clipboard.writeText(link).then(() => {
+                const btn = event.target;
+                const originalText = btn.textContent;
+                btn.textContent = '✅ Kopyalandı!';
+                btn.style.background = '#28a745';
+                
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.style.background = '#007bff';
+                }, 2000);
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aktif Teklifim</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            padding: 20px 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 24px;
+        }
+
+        .revision-badge {
+            background: #007bff;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #0056b3;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .btn-warning {
+            background: #ffc107;
+            color: #333;
+        }
+
+        .btn-warning:hover {
+            background: #e0a800;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #545b62;
+        }
+
+        /* Messages */
+        .messages {
+            margin-bottom: 20px;
+        }
+
+        .message {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(-100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border-left: 4px solid #28a745;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border-left: 4px solid #dc3545;
+        }
+
+        /* Status Banner */
+        .status-banner {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .status-banner.draft { border-left: 5px solid #6c757d; }
+        .status-banner.sent { border-left: 5px solid #ffc107; }
+        .status-banner.approved { border-left: 5px solid #28a745; }
+        .status-banner.rejected { border-left: 5px solid #dc3545; }
+        .status-banner.revised { border-left: 5px solid #17a2b8; }
+
+        .status-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .status-label {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .status-value {
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .status-draft { color: #6c757d; }
+        .status-sent { color: #856404; }
+        .status-approved { color: #28a745; }
+        .status-rejected { color: #dc3545; }
+        .status-revised { color: #17a2b8; }
+
+        .reject-reason {
+            margin-top: 15px;
+            padding: 15px;
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            border-radius: 5px;
+        }
+
+        .reject-reason strong { color: #856404; }
+
+        /* Summary Cards */
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .summary-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .summary-card .label {
+            color: #666;
+            font-size: 12px;
+            margin-bottom: 8px;
+        }
+
+        .summary-card .value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .summary-card.total .value { color: #28a745; }
+
+        /* Products Table */
+        .table-container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .table-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .table-header h2 { font-size: 20px; }
+
+        .products-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .products-table thead { background: #f8f9fa; }
+
+        .products-table thead th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 13px;
+            color: #333;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        .products-table thead th small {
+            color: #999;
+            font-weight: 400;
+        }
+
+        .products-table tbody tr {
+            border-bottom: 1px solid #f0f0f0;
+            transition: all 0.3s;
+        }
+
+        .products-table tbody tr:hover { background: #f8f9fa; }
+
+        .products-table tbody td {
+            padding: 15px;
+            vertical-align: middle;
+        }
+
+        .product-name {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .product-note {
+            color: #666;
+            font-size: 12px;
+            margin-top: 5px;
+            font-style: italic;
+        }
+
+        .price-green {
+            font-weight: bold;
+            color: #28a745;
+        }
+
+        .price-blue {
+            font-size: 12px;
+            color: #007bff;
+        }
+
+        .quantity-form {
+            display: flex;
+            gap: 5px;
+            align-items: center;
+        }
+
+        .quantity-input {
+            width: 60px;
+            padding: 5px;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            text-align: center;
+        }
+
+        .btn-icon { padding: 5px 10px; font-size: 12px; }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+
+        .empty-state h3 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .empty-state p {
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        /* Action Panel */
+        .action-panel {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .total-display {
+            font-size: 28px;
+            font-weight: bold;
+            color: #28a745;
+        }
+
+        .total-sub {
+            font-size: 14px;
+            color: #666;
+            margin-top: 3px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        @media (max-width: 768px) {
+            .products-table { font-size: 12px; }
+            .products-table thead th,
+            .products-table tbody td { padding: 8px; }
+            .header { flex-direction: column; align-items: flex-start; }
+            .summary-cards { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    {% include 'includes/navbar.html' %}
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-left">
+                <h1>📝 Teklif
+                    {% if offer.original_offer %}
+                        #{{ offer.original_offer.id }}
+                    {% else %}
+                        #{{ offer.id }}
+                    {% endif %}
+                    {% if offer.revision_number > 1 %}
+                        <span style="color: #007bff; font-size: 18px;">(Rev.{{ offer.revision_number }})</span>
+                    {% endif %}
+                </h1>
+                {% if offer.revision_number > 1 %}
+                <span class="revision-badge">Revizyon #{{ offer.revision_number }}</span>
+                {% endif %}
+            </div>
+            <div class="header-actions">
+                <a href="{% url 'my_offers' %}" class="btn btn-secondary">← Ana Sayfa</a>
+                {% if offer.original_offer or offer.revisions.exists %}
+                <a href="{% url 'view_offer_history' offer.id %}" class="btn btn-secondary">📜 Geçmiş</a>
+                {% endif %}
+                <a href="{% url 'product_list' %}" class="btn btn-primary">🛍️ Ürün Ekle</a>
+            </div>
+        </div>
+
+        <!-- Messages -->
+        {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+            <div class="message {{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Status Banner -->
+        <div class="status-banner {{ offer.status }}">
+            <div class="status-info">
+                <div>
+                    <div class="status-label">Teklif Durumu</div>
+                    <div class="status-value status-{{ offer.status }}">
+                        {% if offer.status == 'draft' %}📋 Taslak
+                        {% elif offer.status == 'sent' %}📬 Eczaneye Gönderildi
+                        {% elif offer.status == 'approved' %}✅ Onaylandı
+                        {% elif offer.status == 'rejected' %}❌ Reddedildi
+                        {% elif offer.status == 'revised' %}🔄 Revize Edildi
+                        {% endif %}
+                    </div>
+                </div>
+                {% if offer.sent_at %}
+                <div>
+                    <div class="status-label">Gönderilme Tarihi</div>
+                    <div class="status-value" style="font-size:16px;">{{ offer.sent_at|date:"d.m.Y H:i" }}</div>
+                </div>
+                {% endif %}
+                {% if offer.approved_at %}
+                <div>
+                    <div class="status-label">Onaylanma Tarihi</div>
+                    <div class="status-value" style="font-size:16px;">{{ offer.approved_at|date:"d.m.Y H:i" }}</div>
+                </div>
+                {% endif %}
+                {% if offer.rejected_at %}
+                <div>
+                    <div class="status-label">Reddedilme Tarihi</div>
+                    <div class="status-value" style="font-size:16px;">{{ offer.rejected_at|date:"d.m.Y H:i" }}</div>
+                </div>
+                {% endif %}
+            </div>
+            {% if offer.reject_reason %}
+            <div class="reject-reason">
+                <strong>Red Nedeni:</strong> {{ offer.reject_reason }}
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Summary Cards -->
+        <div class="summary-cards">
+            <div class="summary-card">
+                <div class="label">Ürün Sayısı</div>
+                <div class="value">{{ offer.items.count }}</div>
+            </div>
+            <div class="summary-card">
+                <div class="label">KDV Hariç Toplam</div>
+                <div class="value" style="color:#007bff;">{{ offer.items_net_after_item_discounts|floatformat:2 }} ₺</div>
+            </div>
+            <div class="summary-card total">
+                <div class="label">Toplam (KDV Dahil)</div>
+                <div class="value">{{ offer.final_total|floatformat:2 }} ₺</div>
+            </div>
+        </div>
+
+        <!-- Products Table -->
+        <div class="table-container">
+            <div class="table-header">
+                <h2>🛒 Sepetim</h2>
+            </div>
+
+            {% if offer.items.all %}
+            <table class="products-table">
+                <thead>
+                    <tr>
+                        <th>Ürün</th>
+                        <th>Birim Fiyat<br><small>(KDV Dahil / Hariç)</small></th>
+                        <th>Adet</th>
+                        <th>KDV %</th>
+                        <th>Ara Toplam<br><small>(KDV Hariç)</small></th>
+                        <th>KDV Tutarı</th>
+                        <th>Toplam<br><small>(KDV Dahil)</small></th>
+                        {% if offer.status == 'draft' %}
+                        <th>İşlem</th>
+                        {% endif %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in offer.items.all %}
+                    <tr>
+                        <!-- Ürün Adı -->
+                        <td>
+                            <div class="product-name">{{ item.product.name }}</div>
+                            {% if item.note %}
+                            <div class="product-note">📝 Eczane Notu: {{ item.note }}</div>
+                            {% endif %}
+                        </td>
+
+                        <!-- Birim Fiyat: KDV Dahil + KDV Hariç -->
+                        <td>
+                            <span class="price-green">{{ item.unit_price_with_vat|floatformat:2 }} ₺</span><br>
+                            <span class="price-blue">{{ item.unit_price|floatformat:2 }} ₺</span>
+                        </td>
+
+                        <!-- Adet -->
+                        <td>
+                            {% if offer.status == 'draft' %}
+                            <form action="{% url 'update_offer_item' item.id %}" method="post" class="quantity-form">
+                                {% csrf_token %}
+                                <input type="number" name="quantity" value="{{ item.quantity }}" min="1" class="quantity-input">
+                                <button type="submit" class="btn btn-primary btn-icon">✓</button>
+                            </form>
+                            {% else %}
+                            {{ item.quantity }}
+                            {% endif %}
+                        </td>
+
+                        <!-- KDV % -->
+                        <td>{{ item.vat_rate }}%</td>
+
+                        <!-- Ara Toplam (KDV Hariç) -->
+                        <td>{{ item.line_subtotal|floatformat:2 }} ₺</td>
+
+                        <!-- KDV Tutarı -->
+                        <td>{{ item.vat_amount|floatformat:2 }} ₺</td>
+
+                        <!-- Toplam (KDV Dahil) -->
+                        <td><span class="price-green">{{ item.total_price|floatformat:2 }} ₺</span></td>
+
+                        <!-- İşlem -->
+                        {% if offer.status == 'draft' %}
+                        <td>
+                            <form action="{% url 'delete_offer_item' item.id %}" method="post" style="display: inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger btn-icon"
+                                    onclick="return confirm('Bu ürünü sepetten kaldırmak istediğinize emin misiniz?')">
+                                    🗑️
+                                </button>
+                            </form>
+                        </td>
+                        {% endif %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-state-icon">🛒</div>
+                <h3>Sepetiniz Boş</h3>
+                <p>Henüz teklifinize ürün eklemediniz.</p>
+                <a href="{% url 'product_list' %}" class="btn btn-primary">🛍️ Ürün Listesine Git</a>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Action Panel -->
+        {% if offer.items.all %}
+        <div class="action-panel">
+            <div>
+                <div style="color: #666; font-size: 14px; margin-bottom: 5px;">Genel Toplam (KDV Dahil)</div>
+                <div class="total-display">{{ offer.final_total|floatformat:2 }} ₺</div>
+                <div class="total-sub">KDV Hariç: {{ offer.items_net_after_item_discounts|floatformat:2 }} ₺</div>
+            </div>
+
+            <div class="action-buttons">
+                {% if offer.status == 'draft' %}
+                <form action="{% url 'send_offer_to_pharmacy' %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-success"
+                        onclick="return confirm('Teklifi eczaneye göndermek istediğinize emin misiniz?')">
+                        📤 Eczaneye Gönder
+                    </button>
+                </form>
+                {% elif offer.status == 'rejected' %}
+                <a href="{% url 'revise_offer' offer.id %}" class="btn btn-warning">🔄 Revize Et</a>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>

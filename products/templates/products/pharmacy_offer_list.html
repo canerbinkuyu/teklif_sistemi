@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Eczane - Gelen Teklifler</title>
+</head>
+<body>
+    <h1>Gelen Teklifler</h1>
+
+    {% if offers %}
+        <ul>
+            {% for offer in offers %}
+                <li>
+                    <strong>Teklif #{{ offer.id }}</strong>
+                    <br>
+                    Tarih: {{ offer.created_at }}
+                    <br>
+                    <a href="#">Detay</a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>Henüz gelen teklif yok.</p>
+    {% endif %}
+</body>
+</html>

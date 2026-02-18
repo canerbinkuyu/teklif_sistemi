@@ -1,0 +1,270 @@
+<!-- 
+GÜNCELLENMIŞ navbar.html - Inline CSS ile
+templates/includes/navbar.html olarak kaydedin (ÜZERİNE YAZIN)
+-->
+
+<style>
+.global-navbar {
+    background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    width: 100%;
+}
+
+.navbar-container {
+    max-width: 1600px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+}
+
+.navbar-brand {
+    padding: 15px 0;
+}
+
+.navbar-brand a {
+    color: white;
+    text-decoration: none;
+    font-size: 22px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.navbar-menu {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.navbar-menu li a {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 15px 18px;
+    color: white;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.3s;
+    border-radius: 6px;
+}
+
+.navbar-menu li a:hover {
+    background: rgba(255,255,255,0.1);
+}
+
+.navbar-user {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 10px 0;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 15px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 25px;
+}
+
+.user-avatar {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 14px;
+}
+
+.user-details {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.user-name {
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.user-role {
+    color: rgba(255,255,255,0.7);
+    font-size: 11px;
+}
+
+.logout-btn {
+    padding: 8px 18px;
+    background: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.3s;
+}
+
+.logout-btn:hover {
+    background: #c82333;
+}
+
+.mobile-menu-toggle {
+    display: none;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    padding: 10px;
+}
+
+@media (max-width: 992px) {
+    .navbar-menu {
+        position: fixed;
+        top: 70px;
+        left: -100%;
+        width: 280px;
+        height: calc(100vh - 70px);
+        background: #2c3e50;
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 20px 0;
+        transition: left 0.3s;
+        overflow-y: auto;
+    }
+    
+    .navbar-menu.active {
+        left: 0;
+    }
+    
+    .navbar-menu li {
+        width: 100%;
+    }
+    
+    .navbar-menu li a {
+        width: 100%;
+        border-radius: 0;
+    }
+    
+    .mobile-menu-toggle {
+        display: block;
+    }
+    
+    .user-details {
+        display: none;
+    }
+}
+</style>
+
+<nav class="global-navbar">
+    <div class="navbar-container">
+        <!-- Brand -->
+        <div class="navbar-brand">
+            <a href="{% url 'redirect_after_login' %}">
+                <span>💊</span>
+                <span>Teklif Sistemi</span>
+            </a>
+        </div>
+        
+        <!-- Mobile Menu Toggle -->
+        <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">
+            ☰
+        </button>
+        
+        <!-- Menu -->
+        <ul class="navbar-menu" id="navbarMenu">
+            {% if user.is_authenticated %}
+                
+                <!-- ADMIN MENU -->
+                {% if user.is_superuser or user.is_staff %}
+                    <li><a href="{% url 'admin_dashboard' %}">🏠 Admin Dashboard</a></li>
+                    <li><a href="{% url 'admin_users' %}">👥 Kullanıcılar</a></li>
+                    <li><a href="/admin/">⚙️ Django Admin</a></li>
+                
+                <!-- FİRMA MENU -->
+                {% elif user.role == 'firma' %}
+                    <li><a href="{% url 'my_offers' %}">🏠 Ana Sayfa</a></li>
+                    <li><a href="{% url 'product_list' %}">📦 Ürünler</a></li>
+                    <li><a href="{% url 'offer' %}">➕ Yeni Teklif</a></li>
+                    <li><a href="{% url 'address_list' %}">📍 Adreslerim</a></li>
+                    
+                    {% if user.is_manager %}
+                        <li><a href="{% url 'my_staff' %}">👥 Personellerim</a></li>
+                        <li><a href="{% url 'invite_staff' %}">✉️ Personel Davet</a></li>
+                    {% endif %}
+                    
+                    <li><a href="{% url 'profile' %}">👤 Profilim</a></li>
+                
+                <!-- ECZANE MENU -->
+                {% elif user.role == 'eczane' %}
+                    <li><a href="{% url 'pharmacy_dashboard' %}">🏠 Ana Sayfa</a></li>
+                    <li><a href="{% url 'pharmacy_inbox' %}">📬 Gelen Teklifler</a></li>
+                    
+                    {% if user.is_manager %}
+                        <li><a href="{% url 'pharmacist_staff_list' %}">👥 Personellerim</a></li>
+                    {% endif %}
+                    
+                    <li><a href="{% url 'profile' %}">👤 Profilim</a></li>
+                {% endif %}
+            
+            {% endif %}
+        </ul>
+        
+        <!-- User Info & Logout -->
+        {% if user.is_authenticated %}
+        <div class="navbar-user">
+            <div class="user-info">
+                <div class="user-avatar">
+                    {{ user.first_name|first|default:user.username|first }}{{ user.last_name|first }}
+                </div>
+                <div class="user-details">
+                    <div class="user-name">{{ user.get_full_name|default:user.username }}</div>
+                    <div class="user-role">
+                        {% if user.is_superuser %}Süper Admin
+                        {% elif user.is_manager %}Yönetici
+                        {% elif user.role == 'firma' %}Firma Personeli
+                        {% elif user.role == 'eczane' %}Eczane Personeli
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <form method="post" action="{% url 'logout' %}" style="margin:0;">
+                {% csrf_token %}
+                <button type="submit" class="logout-btn">🚪 Çıkış</button>
+            </form>
+        </div>
+        {% endif %}
+    </div>
+</nav>
+
+<script>
+function toggleMobileMenu() {
+    const menu = document.getElementById('navbarMenu');
+    menu.classList.toggle('active');
+}
+
+document.addEventListener('click', function(event) {
+    const menu = document.getElementById('navbarMenu');
+    const toggle = document.querySelector('.mobile-menu-toggle');
+    
+    if (menu && !menu.contains(event.target) && !toggle.contains(event.target)) {
+        menu.classList.remove('active');
+    }
+});
+</script>

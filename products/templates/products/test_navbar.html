@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Navbar Test</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/navbar.css' %}">
+</head>
+<body>
+    <h1 style="background:yellow; padding:20px;">SAYFA BAŞLADI</h1>
+    
+    {% include 'includes/navbar.html' %}
+    
+    <h1 style="background:green; color:white; padding:20px;">SAYFA BİTTİ</h1>
+    
+    <p>Kullanıcı: {{ user.username }}</p>
+    <p>Rol: {{ user.role }}</p>
+</body>
+</html>

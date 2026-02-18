@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teklif Geçmişi</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .header p {
+            color: #666;
+        }
+
+        .back-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #6c757d;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            background: #545b62;
+        }
+
+        .timeline {
+            position: relative;
+            padding-left: 40px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: linear-gradient(to bottom, #667eea, #764ba2);
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 30px;
+        }
+
+        .timeline-marker {
+            position: absolute;
+            left: -33px;
+            top: 20px;
+            width: 30px;
+            height: 30px;
+            background: white;
+            border: 3px solid #667eea;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            z-index: 1;
+        }
+
+        .timeline-marker.current {
+            background: #667eea;
+            color: white;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.2);
+        }
+
+        .revision-card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+
+        .revision-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+
+        .revision-card.current {
+            border: 3px solid #667eea;
+        }
+
+        .revision-header {
+            padding: 20px;
+            background: #f8f9fa;
+            border-bottom: 2px solid #dee2e6;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .revision-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .revision-title h3 {
+            color: #333;
+            font-size: 20px;
+        }
+
+        .badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-current {
+            background: #667eea;
+            color: white;
+        }
+
+        .badge-draft {
+            background: #6c757d;
+            color: white;
+        }
+
+        .badge-sent {
+            background: #ffc107;
+            color: #333;
+        }
+
+        .badge-approved {
+            background: #28a745;
+            color: white;
+        }
+
+        .badge-rejected {
+            background: #dc3545;
+            color: white;
+        }
+
+        .badge-revised {
+            background: #17a2b8;
+            color: white;
+        }
+
+        .revision-date {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .revision-body {
+            padding: 20px;
+        }
+
+        .revision-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-box {
+            text-align: center;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 6px;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            color: #333;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .revision-note {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+
+        .revision-note strong {
+            color: #856404;
+        }
+
+        .revision-note p {
+            color: #856404;
+            margin: 5px 0 0 0;
+        }
+
+        .products-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .products-table thead {
+            background: #f8f9fa;
+        }
+
+        .products-table th {
+            padding: 10px;
+            text-align: left;
+            font-size: 12px;
+            color: #666;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        .products-table td {
+            padding: 10px;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 13px;
+        }
+
+        .product-name {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .price {
+            color: #28a745;
+            font-weight: bold;
+        }
+
+        .action-btn {
+            display: inline-block;
+            padding: 8px 16px;
+            background: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 13px;
+            transition: all 0.3s;
+        }
+
+        .action-btn:hover {
+            background: #0056b3;
+        }
+
+        .empty-note {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+    {% include 'includes/navbar.html' %}
+    <div class="container">
+        <div class="header">
+            <h1>📜 Teklif Geçmişi</h1>
+            <p>Teklif #{{ offer.id }} için tüm revizyon geçmişi</p>
+        </div>
+
+        <a href="{% url 'my_offers' %}" class="back-btn">← Ana Sayfaya Dön</a>
+
+        <div class="timeline">
+            {% for revision in all_revisions %}
+            <div class="timeline-item">
+                <div class="timeline-marker {% if revision == offer %}current{% endif %}">
+                    {{ revision.revision_number }}
+                </div>
+
+                <div class="revision-card {% if revision == offer %}current{% endif %}">
+                    <div class="revision-header">
+                        <div class="revision-title">
+                            <h3>
+                                {% if revision.revision_number == 1 %}
+                                    Orijinal Teklif
+                                {% else %}
+                                    Revizyon #{{ revision.revision_number }}
+                                {% endif %}
+                            </h3>
+                            {% if revision == offer %}
+                            <span class="badge badge-current">📍 Şu Anki</span>
+                            {% endif %}
+                            <span class="badge badge-{{ revision.status }}">
+                                {{ revision.get_status_display }}
+                            </span>
+                        </div>
+                        <div class="revision-date">
+                            {% if revision.revised_at %}
+                                🕒 {{ revision.revised_at|date:"d.m.Y H:i" }}
+                            {% elif revision.created_at %}
+                                🕒 {{ revision.created_at|date:"d.m.Y H:i" }}
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="revision-body">
+                        {% if revision.revision_note %}
+                        <div class="revision-note">
+                            <strong>📝 Revizyon Notu:</strong>
+                            <p>{{ revision.revision_note }}</p>
+                        </div>
+                        {% endif %}
+
+                        <div class="revision-stats">
+                            <div class="stat-box">
+                                <div class="stat-label">Ürün Sayısı</div>
+                                <div class="stat-value">{{ revision.items.count }}</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-label">Ara Toplam</div>
+                                <div class="stat-value">{{ revision.gross_total_price|floatformat:2 }}₺</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-label">Genel Toplam</div>
+                                <div class="stat-value price">{{ revision.total_price|floatformat:2 }}₺</div>
+                            </div>
+                        </div>
+
+                        {% if revision.items.all %}
+                        <table class="products-table">
+                            <thead>
+                                <tr>
+                                    <th>Ürün</th>
+                                    <th>Adet</th>
+                                    <th>Birim Fiyat</th>
+                                    <th>Toplam</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in revision.items.all %}
+                                <tr>
+                                    <td><span class="product-name">{{ item.product.name }}</span></td>
+                                    <td>{{ item.quantity }}</td>
+                                    <td>{{ item.unit_price }}₺</td>
+                                    <td><span class="price">{{ item.total_price|floatformat:2 }}₺</span></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+
+                        {% if revision.status == 'draft' and revision == offer %}
+                        <div style="margin-top: 15px; text-align: right;">
+                            <a href="{% url 'offer' %}" class="action-btn">✏️ Düzenle</a>
+                        </div>
+                        {% endif %}
+                        {% else %}
+                        <div class="empty-note">
+                            Ürün bulunmuyor
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>

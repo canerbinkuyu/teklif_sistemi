@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adreslerim</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container { max-width: 1200px; margin: 0 auto; }
+        
+        .header {
+            background: white;
+            padding: 25px 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header h1 { color: #333; font-size: 24px; }
+        
+        .btn {
+            padding: 10px 20px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+            display: inline-block;
+        }
+        
+        .btn-primary { background: #28a745; color: white; }
+        .btn-primary:hover { background: #218838; }
+        
+        .btn-secondary { background: #6c757d; color: white; }
+        .btn-secondary:hover { background: #545b62; }
+        
+        .btn-sm { padding: 6px 12px; font-size: 12px; }
+        
+        .addresses-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+        }
+        
+        .address-card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+        
+        .address-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+        }
+        
+        .address-header {
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .address-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .address-type {
+            background: rgba(255,255,255,0.2);
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+        }
+        
+        .address-body {
+            padding: 20px;
+        }
+        
+        .address-row {
+            margin-bottom: 12px;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+        
+        .address-icon {
+            color: #667eea;
+            font-size: 16px;
+            width: 20px;
+        }
+        
+        .address-content {
+            flex: 1;
+            font-size: 14px;
+            color: #333;
+        }
+        
+        .address-label {
+            font-size: 12px;
+            color: #999;
+            margin-bottom: 3px;
+        }
+        
+        .default-badge {
+            display: inline-block;
+            background: #28a745;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+        
+        .address-actions {
+            padding: 15px 20px;
+            background: #f8f9fa;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+        
+        .btn-edit { background: #007bff; color: white; }
+        .btn-edit:hover { background: #0056b3; }
+        
+        .btn-delete { background: #dc3545; color: white; }
+        .btn-delete:hover { background: #c82333; }
+        
+        .btn-default { background: #ffc107; color: #333; }
+        .btn-default:hover { background: #e0a800; }
+        
+        .empty-state {
+            background: white;
+            border-radius: 10px;
+            padding: 60px 20px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .empty-icon { font-size: 64px; margin-bottom: 15px; }
+        
+        .messages { margin-bottom: 20px; }
+        .message {
+            padding: 14px 18px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+        .message.success { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .message.error { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+    </style>
+</head>
+<body>
+    {% include 'includes/navbar.html' %}
+    <div class="container">
+        <div class="header">
+            <h1>📍 Adreslerim</h1>
+            <div style="display:flex; gap:10px;">
+                <a href="{% url 'address_create' %}" class="btn btn-primary">+ Yeni Adres Ekle</a>
+                <a href="{% url 'profile' %}" class="btn btn-secondary">← Geri</a>
+            </div>
+        </div>
+        
+        {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+            <div class="message {{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        
+        {% if addresses %}
+        <div class="addresses-grid">
+            {% for address in addresses %}
+            <div class="address-card">
+                <div class="address-header">
+                    <div class="address-title">
+                        {{ address.title }}
+                        {% if address.is_default %}
+                        <span class="default-badge">✓ Varsayılan</span>
+                        {% endif %}
+                    </div>
+                    <div class="address-type">{{ address.get_address_type_display }}</div>
+                </div>
+                
+                <div class="address-body">
+                    <div class="address-row">
+                        <div class="address-icon">📍</div>
+                        <div class="address-content">
+                            <div class="address-label">Adres</div>
+                            {{ address.address_line }}
+                        </div>
+                    </div>
+                    
+                    <div class="address-row">
+                        <div class="address-icon">🏙️</div>
+                        <div class="address-content">
+                            <div class="address-label">Şehir</div>
+                            {{ address.city }}{% if address.district %} / {{ address.district }}{% endif %}
+                            {% if address.postal_code %} - {{ address.postal_code }}{% endif %}
+                        </div>
+                    </div>
+                    
+                    {% if address.contact_person %}
+                    <div class="address-row">
+                        <div class="address-icon">👤</div>
+                        <div class="address-content">
+                            <div class="address-label">İletişim Kişisi</div>
+                            {{ address.contact_person }}
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if address.phone %}
+                    <div class="address-row">
+                        <div class="address-icon">📞</div>
+                        <div class="address-content">
+                            <div class="address-label">Telefon</div>
+                            {{ address.phone }}
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if address.email %}
+                    <div class="address-row">
+                        <div class="address-icon">✉️</div>
+                        <div class="address-content">
+                            <div class="address-label">Email</div>
+                            {{ address.email }}
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if address.notes %}
+                    <div class="address-row">
+                        <div class="address-icon">📝</div>
+                        <div class="address-content">
+                            <div class="address-label">Notlar</div>
+                            {{ address.notes }}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <div class="address-actions">
+                    {% if not address.is_default %}
+                    <form method="post" action="{% url 'address_set_default' address.id %}" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-default btn-sm">⭐ Varsayılan Yap</button>
+                    </form>
+                    {% endif %}
+                    
+                    <a href="{% url 'address_edit' address.id %}" class="btn btn-edit btn-sm">✏️ Düzenle</a>
+                    
+                    <form method="post" action="{% url 'address_delete' address.id %}" style="display:inline;" onsubmit="return confirm('{{ address.title }} adresini silmek istediğinize emin misiniz?');">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-delete btn-sm">🗑️ Sil</button>
+                    </form>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">📍</div>
+            <h3>Henüz adres eklenmemiş</h3>
+            <p style="color:#999; margin:10px 0 20px 0;">Teslimat adresi eklemek için "Yeni Adres Ekle" butonuna tıklayın.</p>
+            <a href="{% url 'address_create' %}" class="btn btn-primary">+ Yeni Adres Ekle</a>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>

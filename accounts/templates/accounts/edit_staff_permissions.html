@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yetki Düzenleme - {{ staff.get_full_name }}</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container { max-width: 900px; margin: 0 auto; }
+        
+        .header {
+            background: white;
+            padding: 25px 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header h1 { color: #333; font-size: 24px; }
+        
+        .btn {
+            padding: 10px 20px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+        
+        .btn-secondary { background: #6c757d; color: white; }
+        .btn-secondary:hover { background: #545b62; }
+        
+        .btn-primary { background: #007bff; color: white; }
+        .btn-primary:hover { background: #0056b3; }
+        
+        .info-card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        .user-info {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .info-item {
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 6px;
+        }
+        
+        .info-label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        .info-value {
+            font-size: 14px;
+            color: #333;
+            font-weight: 600;
+        }
+        
+        .status-toggle {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 20px;
+            border-radius: 6px;
+            margin-top: 20px;
+        }
+        
+        .toggle-label {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .toggle-label input[type="checkbox"] {
+            width: 50px;
+            height: 25px;
+            cursor: pointer;
+        }
+        
+        .permissions-section {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        .section-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 20px;
+            margin: -25px -25px 20px -25px;
+            border-radius: 10px 10px 0 0;
+        }
+        
+        .section-header h2 { font-size: 18px; }
+        
+        .permission-group {
+            margin-bottom: 25px;
+            padding-bottom: 25px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .permission-group:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+        
+        .group-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #667eea;
+        }
+        
+        .permission-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            margin-bottom: 8px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            transition: all 0.3s;
+        }
+        
+        .permission-item:hover {
+            background: #e9ecef;
+        }
+        
+        .permission-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-right: 15px;
+            cursor: pointer;
+        }
+        
+        .permission-label {
+            flex: 1;
+            font-size: 14px;
+            color: #333;
+            cursor: pointer;
+        }
+        
+        .permission-description {
+            font-size: 12px;
+            color: #666;
+            margin-top: 3px;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+        
+        .messages { margin-bottom: 20px; }
+        .message {
+            padding: 14px 18px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+        .message.success { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .message.error { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+    </style>
+</head>
+<body>
+    {% include 'includes/navbar.html' %}
+    <div class="container">
+        <div class="header">
+            <h1>⚙️ Yetki Düzenleme</h1>
+            <a href="{% if user.role == 'firma' %}{% url 'my_staff' %}{% else %}{% url 'pharmacist_staff_list' %}{% endif %}" class="btn btn-secondary">← Geri</a>
+        </div>
+        
+        {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+            <div class="message {{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        
+        <div class="info-card">
+            <h3 style="margin-bottom:15px; color:#333;">👤 Personel Bilgileri</h3>
+            <div class="user-info">
+                <div class="info-item">
+                    <div class="info-label">Ad Soyad</div>
+                    <div class="info-value">{{ staff.get_full_name }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Kullanıcı Adı</div>
+                    <div class="info-value">{{ staff.username }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Email</div>
+                    <div class="info-value">{{ staff.email }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Rol</div>
+                    <div class="info-value">
+                        {% if staff.role == 'firma' %}🏢 Firma Personeli{% else %}💊 Eczane Personeli{% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="status-toggle">
+                <label class="toggle-label">
+                    <input type="checkbox" {% if staff.is_active_user %}checked{% endif %} disabled>
+                    <span>Personel Durumu: {% if staff.is_active_user %}<strong style="color:#28a745;">✅ Aktif</strong>{% else %}<strong style="color:#dc3545;">❌ Pasif</strong>{% endif %}</span>
+                </label>
+                <p style="font-size:12px; color:#666; margin-top:10px;">Aktiflik durumunu aşağıdaki formdan değiştirebilirsiniz.</p>
+            </div>
+        </div>
+        
+        <form method="post">
+            {% csrf_token %}
+            
+            <div class="permissions-section">
+                <div class="section-header">
+                    <h2>🔐 Yetkiler</h2>
+                </div>
+                
+                <!-- Aktiflik Durumu -->
+                <div class="permission-group">
+                    <div class="group-title">🟢 Durum Yönetimi</div>
+                    <div class="permission-item">
+                        <input type="checkbox" name="is_active_user" id="is_active_user" {% if staff.is_active_user %}checked{% endif %}>
+                        <label for="is_active_user" class="permission-label">
+                            <strong>Aktif Kullanıcı</strong>
+                            <div class="permission-description">Personel sisteme giriş yapabilir</div>
+                        </label>
+                    </div>
+                </div>
+                
+                {% if user.role == 'firma' %}
+                
+                <!-- FİRMA YETKİLERİ -->
+                <div class="permission-group">
+                    <div class="group-title">📋 Teklif İşlemleri</div>
+                    
+                    <div class="permission-item">
+                        <input type="checkbox" name="can_create_offer" id="can_create_offer" {% if staff.can_create_offer %}checked{% endif %}>
+                        <label for="can_create_offer" class="permission-label">
+                            <strong>Teklif Oluşturabilir</strong>
+                            <div class="permission-description">Yeni teklif hazırlayabilir</div>
+                        </label>
+                    </div>
+                    
+                    <div class="permission-item">
+                        <input type="checkbox" name="can_edit_own_offer" id="can_edit_own_offer" {% if staff.can_edit_own_offer %}checked{% endif %}>
+                        <label for="can_edit_own_offer" class="permission-label">
+                            <strong>Kendi Tekliflerini Düzenleyebilir</strong>
+                            <div class="permission-description">Sadece kendi oluşturduğu teklifleri düzenler</div>
+                        </label>
+                    </div>
+                    
+                    <div class="permission-item">
+                        <input type="checkbox" name="can_revise_offer" id="can_revise_offer" {% if staff.can_revise_offer %}checked{% endif %}>
+                        <label for="can_revise_offer" class="permission-label">
+                            <strong>Teklif Revize Edebilir</strong>
+                            <div class="permission-description">Reddedilen teklifleri revize edebilir</div>
+                        </label>
+                    </div>
+                    
+                    <div class="permission-item">
+                        <input type="checkbox" name="can_edit_all_offers" id="can_edit_all_offers" {% if staff.can_edit_all_offers %}checked{% endif %}>
+                        <label for="can_edit_all_offers" class="permission-label">
+                            <strong>Tüm Teklifleri Düzenleyebilir</strong>
+                            <div class="permission-description">Diğer personellerin tekliflerini de düzenler</div>
+                        </label>
+                    </div>
+                    
+                    <div class="permission-item">
+                        <input type="checkbox" name="can_delete_own_offer" id="can_delete_own_offer" {% if staff.can_delete_own_offer %}checked{% endif %}>
+                        <label for="can_delete_own_offer" class="permission-label">
+                            <strong>Kendi Tekliflerini Silebilir</strong>
+                            <div class="permission-description">Sadece kendi oluşturduğu teklifleri siler</div>
+                        </label>
+                    </div>
+                    
+                    <div class="permission-item">
+                        <input type="checkbox" name="can_delete_all_offers" id="can_delete_all_offers" {% if staff.can_delete_all_offers %}checked{% endif %}>
+                        <label for="can_delete_all_offers" class="permission-label">
+                            <strong>Tüm Teklifleri Silebilir</strong>
+                            <div class="permission-description">Diğer personellerin tekliflerini de siler</div>
+                        </label>
+                    </div>
+                    
+                    <div class="permission-item">
+                        <input type="checkbox" name="can_send_offer" id="can_send_offer" {% if staff.can_send_offer %}checked{% endif %}>
+                        <label for="can_send_offer" class="permission-label">
+                            <strong>Teklif Gönderebilir</strong>
+                            <div class="permission-description">Teklifleri eczaneye gönderebilir (&lt;50K)</div>
+                        </label>
+                    </div>
+                    
+                    <div class="permission-item">
+                        <input type="checkbox" name="can_view_all_offers" id="can_view_all_offers" {% if staff.can_view_all_offers %}checked{% endif %}>
+                        <label for="can_view_all_offers" class="permission-label">
+                            <strong>Tüm Teklifleri Görebilir</strong>
+                            <div class="permission-description">Diğer personellerin tekliflerini de görür</div>
+                        </label>
+                    </div>
+                    
+                    <div class="permission-item">
+                        <input type="checkbox" name="can_approve_high_value_offers" id="can_approve_high_value_offers" {% if staff.can_approve_high_value_offers %}checked{% endif %}>
+                        <label for="can_approve_high_value_offers" class="permission-label">
+                            <strong>50K+ Teklifleri Onaylayabilir</strong>
+                            <div class="permission-description">Yüksek tutarlı teklifleri onaylayabilir</div>
+                        </label>
+                    </div>
+                </div>
+
+
+                <div class="permission-group">
+                    <div class="group-title">👥 Personel Yönetimi</div>
+                    
+                    <div class="permission-item">
+                        <input type="checkbox" name="can_invite_staff" id="can_invite_staff" {% if staff.can_invite_staff %}checked{% endif %}>
+                        <label for="can_invite_staff" class="permission-label">
+                            <strong>Personel Davet Edebilir</strong>
+                            <div class="permission-description">Yeni personel için davetiye oluşturabilir</div>
+                        </label>
+                    </div>
+                    
+                    <div class="permission-item">
+                        <input type="checkbox" name="can_manage_staff_permissions" id="can_manage_staff_permissions" {% if staff.can_manage_staff_permissions %}checked{% endif %}>
+                        <label for="can_manage_staff_permissions" class="permission-label">
+                            <strong>Personel Yetkilerini Düzenleyebilir</strong>
+                            <div class="permission-description">Diğer personellerin yetkilerini değiştirebilir</div>
+                        </label>
+                    </div>
+                    
+                    <div class="permission-item">
+                        <input type="checkbox" name="can_activate_deactivate_staff" id="can_activate_deactivate_staff" {% if staff.can_activate_deactivate_staff %}checked{% endif %}>
+                        <label for="can_activate_deactivate_staff" class="permission-label">
+                            <strong>Personeli Aktif/Pasif Yapabilir</strong>
+                            <div class="permission-description">Personellerin durum yönetimi</div>
+                        </label>
+                    </div>
+                    
+                    <div class="permission-item">
+                        <input type="checkbox" name="can_promote_to_manager" id="can_promote_to_manager" {% if staff.can_promote_to_manager %}checked{% endif %}>
+                        <label for="can_promote_to_manager" class="permission-label">
+                            <strong>Personeli Yönetici Yapabilir</strong>
+                            <div class="permission-description">Personele yönetici yetkisi verebilir</div>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="permission-group">
+                    <div class="group-title">📊 Raporlar ve Analiz</div>
+                    
+                    <div class="permission-item">
+                        <input type="checkbox" name="can_view_reports" id="can_view_reports" {% if staff.can_view_reports %}checked{% endif %}>
+                        <label for="can_view_reports" class="permission-label">
+                            <strong>Raporları Görebilir</strong>
+                            <div class="permission-description">Satış ve teklif raporlarını görüntüler</div>
+                        </label>
+                    </div>
+                    
+                    <div class="permission-item">
+                        <input type="checkbox" name="can_view_financial_data" id="can_view_financial_data" {% if staff.can_view_financial_data %}checked{% endif %}>
+                        <label for="can_view_financial_data" class="permission-label">
+                            <strong>Finansal Verileri Görebilir</strong>
+                            <div class="permission-description">Fiyat, kar marjı gibi finansal bilgileri görür</div>
+                        </label>
+                    </div>
+                    
+                    <div class="permission-item">
+                        <input type="checkbox" name="can_export_data" id="can_export_data" {% if staff.can_export_data %}checked{% endif %}>
+                        <label for="can_export_data" class="permission-label">
+                            <strong>Veri Dışa Aktarabilir</strong>
+                            <div class="permission-description">Excel, PDF olarak veri indirebilir</div>
+                        </label>
+                    </div>
+                </div>
+                
+                {% elif user.role == 'eczane' %}
+                <!-- ECZANE YETKİLERİ -->
+                <div class="permission-group">
+                    <div class="group-title">📋 Teklif İşlemleri</div>
+                    
+                    <div class="permission-item">
+                        <input type="checkbox" name="can_approve_pharmacy_offers" id="can_approve_pharmacy_offers" {% if staff.can_approve_pharmacy_offers %}checked{% endif %}>
+                        <label for="can_approve_pharmacy_offers" class="permission-label">
+                            <strong>Teklif Onaylayabilir</strong>
+                            <div class="permission-description">Gelen teklifleri onaylayabilir (&lt;50K)</div>
+                        </label>
+                    </div>
+                    
+                    <div class="permission-item">
+                        <input type="checkbox" name="can_reject_pharmacy_offers" id="can_reject_pharmacy_offers" {% if staff.can_reject_pharmacy_offers %}checked{% endif %}>
+                        <label for="can_reject_pharmacy_offers" class="permission-label">
+                            <strong>Teklif Reddedebilir</strong>
+                            <div class="permission-description">Gelen teklifleri reddedebilir</div>
+                        </label>
+                    </div>
+                    
+                    <div class="permission-item">
+                        <input type="checkbox" name="can_approve_high_value_pharmacy_offers" id="can_approve_high_value_pharmacy_offers" {% if staff.can_approve_high_value_pharmacy_offers %}checked{% endif %}>
+                        <label for="can_approve_high_value_pharmacy_offers" class="permission-label">
+                            <strong>50K+ Teklifleri Onaylayabilir</strong>
+                            <div class="permission-description">Yüksek tutarlı teklifleri onaylayabilir</div>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="permission-group">
+                    <div class="group-title">💰 İskonto Yönetimi</div>
+                    
+                    <div class="permission-item">
+                        <input type="checkbox" name="can_apply_discount" id="can_apply_discount" {% if staff.can_apply_discount %}checked{% endif %}>
+                        <label for="can_apply_discount" class="permission-label">
+                            <strong>İskonto Uygulayabilir</strong>
+                            <div class="permission-description">Tekliflere iskonto uygulayabilir (&lt;%20)</div>
+                        </label>
+                    </div>
+                    
+                    <div class="permission-item">
+                        <input type="checkbox" name="can_apply_high_discount" id="can_apply_high_discount" {% if staff.can_apply_high_discount %}checked{% endif %}>
+                        <label for="can_apply_high_discount" class="permission-label">
+                            <strong>%20+ İskonto Uygulayabilir</strong>
+                            <div class="permission-description">Yüksek oranlı iskonto uygulayabilir</div>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="permission-group">
+                    <div class="group-title">🧾 Fatura İşlemleri</div>
+                    
+                    <div class="permission-item">
+                        <input type="checkbox" name="can_enter_invoice" id="can_enter_invoice" {% if staff.can_enter_invoice %}checked{% endif %}>
+                        <label for="can_enter_invoice" class="permission-label">
+                            <strong>Fatura Bilgisi Girebilir</strong>
+                            <div class="permission-description">Onaylanan tekliflere fatura bilgisi ekler</div>
+                        </label>
+                    </div>
+                    
+                    <div class="permission-item">
+                        <input type="checkbox" name="can_approve_invoice_revision" id="can_approve_invoice_revision" {% if staff.can_approve_invoice_revision %}checked{% endif %}>
+                        <label for="can_approve_invoice_revision" class="permission-label">
+                            <strong>Fatura Revize Onaylayabilir</strong>
+                            <div class="permission-description">Fatura düzeltme taleplerini onaylar</div>
+                        </label>
+                    </div>
+                    
+                    <div class="permission-item">
+                        <input type="checkbox" name="can_edit_invoice" id="can_edit_invoice" {% if staff.can_edit_invoice %}checked{% endif %}>
+                        <label for="can_edit_invoice" class="permission-label">
+                            <strong>Fatura Düzenleyebilir</strong>
+                            <div class="permission-description">Mevcut faturaları düzenleyebilir</div>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="permission-group">
+                    <div class="group-title">👥 Personel Yönetimi</div>
+                    
+                    <div class="permission-item">
+                        <input type="checkbox" name="can_approve_pharmacy_staff" id="can_approve_pharmacy_staff" {% if staff.can_approve_pharmacy_staff %}checked{% endif %}>
+                        <label for="can_approve_pharmacy_staff" class="permission-label">
+                            <strong>Personel Onaylayabilir</strong>
+                            <div class="permission-description">Yeni personel kayıtlarını onaylar</div>
+                        </label>
+                    </div>
+                    
+                    <div class="permission-item">
+                        <input type="checkbox" name="can_manage_pharmacy_staff" id="can_manage_pharmacy_staff" {% if staff.can_manage_pharmacy_staff %}checked{% endif %}>
+                        <label for="can_manage_pharmacy_staff" class="permission-label">
+                            <strong>Personel Yönetebilir</strong>
+                            <div class="permission-description">Personel yetkilerini düzenleyebilir</div>
+                        </label>
+                    </div>
+
+                    <div class="permission-item">
+                        <input type="checkbox" name="can_manage_pharmacy_staff" id="can_manage_pharmacy_staff" {% if staff.can_manage_pharmacy_staff %}checked{% endif %}>
+                        <label for="can_manage_pharmacy_staff" class="permission-label">
+                            <strong>Eczane Personeli Yönetebilir</strong>
+                            <div class="permission-description">Personel onaylama ve yönetimi</div>
+                        </label>
+                    </div>
+
+                    <div class="permission-item">
+                        <input type="checkbox" name="can_update_product_prices" id="can_update_product_prices" {% if staff.can_update_product_prices %}checked{% endif %}>
+                        <label for="can_update_product_prices" class="permission-label">
+                            <strong>Ürün Fiyatlarını Güncelleyebilir</strong>
+                            <div class="permission-description">Ürün bilgilerini düzenleyebilir</div>
+                        </label>
+                    </div>
+
+                </div>
+                {% endif %}
+            </div>
+            
+            <div class="action-buttons">
+                <a href="{% if user.role == 'firma' %}{% url 'my_staff' %}{% else %}{% url 'pharmacist_staff_list' %}{% endif %}" class="btn btn-secondary">İptal</a>
+                <button type="submit" class="btn btn-primary">💾 Kaydet</button>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

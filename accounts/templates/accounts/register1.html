@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kayıt Ol - Teklif Sistemi</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 500px;
+            width: 100%;
+        }
+
+        .register-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            padding: 40px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #2c3e50;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            color: #2c3e50;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .form-label .required {
+            color: #e74c3c;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: all 0.3s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 15px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .form-select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .password-wrapper {
+            position: relative;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+            color: #7f8c8d;
+        }
+
+        .password-strength {
+            margin-top: 8px;
+            height: 4px;
+            background: #ecf0f1;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .password-strength-bar {
+            height: 100%;
+            width: 0%;
+            transition: all 0.3s;
+            border-radius: 2px;
+        }
+
+        .strength-weak {
+            background: #e74c3c;
+            width: 33%;
+        }
+
+        .strength-medium {
+            background: #f39c12;
+            width: 66%;
+        }
+
+        .strength-strong {
+            background: #27ae60;
+            width: 100%;
+        }
+
+        .password-requirements {
+            margin-top: 10px;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            font-size: 12px;
+        }
+
+        .requirement {
+            color: #95a5a6;
+            margin: 5px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .requirement.met {
+            color: #27ae60;
+        }
+
+        .requirement.met::before {
+            content: "✓";
+            font-weight: bold;
+        }
+
+        .requirement:not(.met)::before {
+            content: "○";
+        }
+
+        .messages {
+            margin-bottom: 20px;
+        }
+
+        .message {
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .message.error {
+            background: #fee;
+            color: #c33;
+            border: 1px solid #fcc;
+        }
+
+        .message.success {
+            background: #efe;
+            color: #3c3;
+            border: 1px solid #cfc;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+
+        .footer a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        @media (max-width: 600px) {
+            .register-card {
+                padding: 30px 20px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="register-card">
+            <div class="header">
+                <h1>🎯 Kayıt Ol</h1>
+                <p>Hesap oluşturmak için bilgilerinizi girin</p>
+            </div>
+
+            {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                <div class="message {{ message.tags }}">
+                    {{ message }}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <form method="post" id="registerForm">
+                {% csrf_token %}
+
+                <!-- Ad Soyad -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">
+                            Ad
+                        </label>
+                        <input 
+                            type="text" 
+                            name="first_name" 
+                            class="form-input" 
+                            placeholder="Adınız"
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">
+                            Soyad
+                        </label>
+                        <input 
+                            type="text" 
+                            name="last_name" 
+                            class="form-input" 
+                            placeholder="Soyadınız"
+                        >
+                    </div>
+                </div>
+
+                <!-- Kullanıcı Adı -->
+                <div class="form-group">
+                    <label class="form-label">
+                        Kullanıcı Adı <span class="required">*</span>
+                    </label>
+                    <input 
+                        type="text" 
+                        name="username" 
+                        class="form-input" 
+                        placeholder="Kullanıcı adınızı girin"
+                        required
+                        minlength="3"
+                    >
+                </div>
+
+                <!-- E-posta -->
+                <div class="form-group">
+                    <label class="form-label">
+                        E-posta <span class="required">*</span>
+                    </label>
+                    <input 
+                        type="email" 
+                        name="email" 
+                        class="form-input" 
+                        placeholder="ornek@email.com"
+                        required
+                    >
+                </div>
+
+                <!-- Rol -->
+                <div class="form-group">
+                    <label class="form-label">
+                        Hesap Türü <span class="required">*</span>
+                    </label>
+                    <select name="role" class="form-select" required>
+                        <option value="">Seçiniz...</option>
+                        <option value="firma">🏢 Firma</option>
+                        <option value="eczane">🏥 Eczane</option>
+                    </select>
+                </div>
+
+                <!-- Şifre -->
+                <div class="form-group">
+                    <label class="form-label">
+                        Şifre <span class="required">*</span>
+                    </label>
+                    <div class="password-wrapper">
+                        <input 
+                            type="password" 
+                            name="password" 
+                            id="password"
+                            class="form-input" 
+                            placeholder="Güçlü bir şifre girin"
+                            required
+                        >
+                        <button type="button" class="toggle-password" onclick="togglePassword('password')">
+                            👁️
+                        </button>
+                    </div>
+                    <div class="password-strength">
+                        <div class="password-strength-bar" id="strengthBar"></div>
+                    </div>
+                    <div class="password-requirements">
+                        <div class="requirement" id="req-length">En az 8 karakter</div>
+                        <div class="requirement" id="req-upper">En az bir büyük harf</div>
+                        <div class="requirement" id="req-lower">En az bir küçük harf</div>
+                        <div class="requirement" id="req-number">En az bir rakam</div>
+                    </div>
+                </div>
+
+                <!-- Şifre Tekrar -->
+                <div class="form-group">
+                    <label class="form-label">
+                        Şifre Tekrar <span class="required">*</span>
+                    </label>
+                    <div class="password-wrapper">
+                        <input 
+                            type="password" 
+                            name="password_confirm" 
+                            id="password_confirm"
+                            class="form-input" 
+                            placeholder="Şifrenizi tekrar girin"
+                            required
+                        >
+                        <button type="button" class="toggle-password" onclick="togglePassword('password_confirm')">
+                            👁️
+                        </button>
+                    </div>
+                </div>
+
+                <button type="submit" class="submit-btn" id="submitBtn">
+                    Kayıt Ol
+                </button>
+            </form>
+
+            <div class="footer">
+                Zaten hesabınız var mı? <a href="{% url 'login' %}">Giriş Yapın</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const passwordInput = document.getElementById('password');
+        const strengthBar = document.getElementById('strengthBar');
+        const submitBtn = document.getElementById('submitBtn');
+
+        function togglePassword(inputId) {
+            const input = document.getElementById(inputId);
+            input.type = input.type === 'password' ? 'text' : 'password';
+        }
+
+        passwordInput.addEventListener('input', function() {
+            const password = this.value;
+            
+            // Requirements check
+            const hasLength = password.length >= 8;
+            const hasUpper = /[A-Z]/.test(password);
+            const hasLower = /[a-z]/.test(password);
+            const hasNumber = /[0-9]/.test(password);
+
+            document.getElementById('req-length').classList.toggle('met', hasLength);
+            document.getElementById('req-upper').classList.toggle('met', hasUpper);
+            document.getElementById('req-lower').classList.toggle('met', hasLower);
+            document.getElementById('req-number').classList.toggle('met', hasNumber);
+
+            // Strength calculation
+            let strength = 0;
+            if (hasLength) strength++;
+            if (hasUpper) strength++;
+            if (hasLower) strength++;
+            if (hasNumber) strength++;
+
+            // Update strength bar
+            strengthBar.className = 'password-strength-bar';
+            if (strength === 1 || strength === 2) {
+                strengthBar.classList.add('strength-weak');
+            } else if (strength === 3) {
+                strengthBar.classList.add('strength-medium');
+            } else if (strength === 4) {
+                strengthBar.classList.add('strength-strong');
+            }
+
+            // Enable/disable submit button
+            const allMet = hasLength && hasUpper && hasLower && hasNumber;
+            submitBtn.disabled = !allMet;
+        });
+
+        // Form validation
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('password_confirm').value;
+
+            if (password !== confirmPassword) {
+                e.preventDefault();
+                alert('Şifreler eşleşmiyor!');
+            }
+        });
+    </script>
+</body>
+</html>
