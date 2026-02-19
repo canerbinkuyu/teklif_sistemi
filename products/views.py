@@ -1534,6 +1534,14 @@ def pharmacy_product_management(request):
     
     # Tüm ürünleri getir
     products_list = Product.objects.all().order_by('-id')
+
+    # Arama filtresi
+    search_query = request.GET.get('search', '').strip()
+    if search_query:
+        products_list = products_list.filter(
+            Q(name__icontains=search_query) | 
+            Q(barcode__icontains=search_query)
+        )
     
     # Sayfalama
     paginator = Paginator(products_list, 50)

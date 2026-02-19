@@ -176,6 +176,32 @@
                 <div class="stat-label">Toplam Ürün</div>
             </div>
         </div>
+
+        </div>
+
+<!-- Arama -->
+<div style="background:white; padding:20px; border-radius:10px; box-shadow:0 4px 6px rgba(0,0,0,0.1); margin-bottom:20px;">
+    <form method="get" style="display:flex; gap:10px; align-items:center;">
+        <input 
+            type="text" 
+            name="search" 
+            placeholder="🔍 Ürün adı veya barkod ile ara..." 
+            value="{{ request.GET.search }}"
+            style="flex:1; padding:12px 15px; border:2px solid #e0e0e0; border-radius:6px; font-size:14px;"
+        >
+        <button type="submit" class="btn btn-primary" style="padding:12px 24px;">Ara</button>
+        {% if request.GET.search %}
+        <a href="{% url 'pharmacy_product_management' %}" class="btn btn-secondary" style="padding:12px 24px;">Temizle</a>
+        {% endif %}
+    </form>
+    {% if request.GET.search %}
+    <div style="margin-top:10px; color:#666; font-size:13px;">
+        <strong>{{ products.paginator.count }}</strong> sonuç bulundu: "<strong>{{ request.GET.search }}</strong>"
+    </div>
+    {% endif %}
+</div>
+
+<div class="table-section">
         
         <div class="table-section">
             <div class="table-header">📋 Ürün Listesi</div>
