@@ -634,8 +634,8 @@ def edit_staff_permissions(request, user_id):
             staff.can_edit_invoice = request.POST.get("can_edit_invoice") == "on"
             staff.can_approve_pharmacy_staff = request.POST.get("can_approve_pharmacy_staff") == "on"
             staff.can_manage_pharmacy_staff = request.POST.get("can_manage_pharmacy_staff") == "on"
-            staff.can_manage_pharmacy_staff = request.POST.get("can_manage_pharmacy_staff") == "on"
             staff.can_update_product_prices = request.POST.get("can_update_product_prices") == "on"  # YENİ
+            staff.can_manage_products = request.POST.get("can_manage_products") == "on"  # YENİ
         
         staff.save()
         

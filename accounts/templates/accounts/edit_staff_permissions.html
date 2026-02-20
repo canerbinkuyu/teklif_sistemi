@@ -510,6 +510,14 @@
                     </div>
 
                     <div class="permission-item">
+                        <input type="checkbox" name="can_manage_products" id="can_manage_products" {% if staff.can_manage_products %}checked{% endif %}>
+                        <label for="can_manage_products" class="permission-label">
+                            <strong>Ürün Yönetebilir</strong>
+                            <div class="permission-description">Ürün ekleme, düzenleme ve silme yetkisi</div>
+                        </label>
+                    </div>
+
+                    <div class="permission-item">
                         <input type="checkbox" name="can_update_product_prices" id="can_update_product_prices" {% if staff.can_update_product_prices %}checked{% endif %}>
                         <label for="can_update_product_prices" class="permission-label">
                             <strong>Ürün Fiyatlarını Güncelleyebilir</strong>
